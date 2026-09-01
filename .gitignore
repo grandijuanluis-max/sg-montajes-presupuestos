@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints
+venv/
+.venv/
+env/
+
+# Streamlit secrets
+.streamlit/secrets.toml
+
+# Local data
+data/
+*.log
+*.tmp
+
+# FoxPro / binarios de origen (no van a GitHub ni a Streamlit Cloud)
+*.dbi
+*.DBI
+*.fpt
+*.FPT
+*.xlsx
+
+# OS
+.DS_Store
+._*
+
+# Firebase local cache / binary (235 MB)
+.firebase/
+firebase

@@ -1,0 +1,2150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>Gestión de Presupuestos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css?v=18">
+</head>
+<body>
+    <div id="app">
+        <!-- Notificaciones flotantes -->
+        <div id="toast-container"></div>
+
+        <!-- Pantalla de Login -->
+        <section id="login-view" class="view active glass-panel" style="max-width: 450px;">
+            <div class="login-header" style="text-align: center;">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 20px;">
+                    <img src="logo_sg_montajes.png" alt="SG MONTAJES Logo" style="width: 160px; height: auto; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));">
+                    <div style="font-size: 22px; font-weight: 800; color: white; letter-spacing: 1px; line-height: 1.2;">
+                        SG <span style="font-weight: 400; color: var(--warning); letter-spacing: 1.5px;">MONTAJES</span>
+                    </div>
+                </div>
+                <h3 style="margin-top: 10px; color: var(--primary); font-size: 18px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Gestión de Presupuestos</h3>
+                <div id="login-quote" class="login-quote" style="margin-top: 10px;"></div>
+            </div>
+            <form id="login-form" onsubmit="event.preventDefault(); window.ejecutarLoginDirecto(event);">
+                <div class="form-group">
+                    <label for="username">Usuario</label>
+                    <input type="text" id="username" placeholder="Ingrese su usuario" onkeydown="if(event.key === 'Enter') { event.preventDefault(); window.ejecutarLoginDirecto(event); }">
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" placeholder="••••••••" onkeydown="if(event.key === 'Enter') { event.preventDefault(); window.ejecutarLoginDirecto(event); }">
+                </div>
+                <button type="button" class="btn btn-primary" onclick="window.ejecutarLoginDirecto(event)" style="width: 100%; font-weight: bold; cursor: pointer; position: relative; z-index: 10;">Ingresar</button>
+            </form>
+        </section>
+
+        <!-- Contenedor Principal (Dashboard) -->
+        <section id="main-view" class="view">
+            <header class="glass-header">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <button id="sidebar-toggle" class="btn btn-sm" title="Alternar Menú">☰</button>
+                    <!-- Botón Volver a la Acción Anterior -->
+                    <button id="btn-global-volver" class="btn btn-sm btn-nav-volver" onclick="volverAccionAnterior()" title="Volver a la acción o pantalla anterior (Alt + ←)" style="display: inline-flex; align-items: center; gap: 6px; background: rgba(15, 23, 42, 0.7); border: 1.5px solid rgba(56, 189, 248, 0.5); color: #38bdf8; font-weight: 700; font-size: 12px; height: 32px; padding: 0 12px; border-radius: 6px; transition: all 0.2s ease; cursor: pointer;">
+                        <i class="fa-solid fa-arrow-left"></i> <span>Volver</span>
+                    </button>
+                    <div class="logo" style="display: flex; align-items: center; gap: 10px;">
+                        <img src="logo_sg_montajes.png" alt="SG MONTAJES Logo" style="width: auto; height: 28px; object-fit: contain;">
+                        <span style="font-weight: 800; font-size: 14px; letter-spacing: 0.5px;">SG <span style="font-weight: 400; color: var(--warning);">MONTAJES</span></span>
+                    </div>
+                </div>
+                <div id="motivational-quote" class="motivational-quote"></div>
+                <div class="user-info" style="position: relative; display: flex; align-items: center; gap: 15px;">
+                    <!-- Campanita de notificaciones -->
+                    <div id="notification-bell" style="position: relative; cursor: pointer; padding: 5px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                        <i class="fas fa-bell" style="font-size: 26px; color: #ffffff; text-shadow: 0 2px 8px rgba(0,0,0,0.6);"></i>
+                        <span id="notification-badge" style="display: none; position: absolute; top: -2px; right: -4px; background: #ff3b30; color: white; font-size: 12px; font-weight: 800; padding: 3px 7px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.6); border: 2px solid var(--glass-bg);">0</span>
+                    </div>
+                    <!-- Dropdown de Notificaciones -->
+                    <div id="notification-dropdown" class="glass-card" style="display: none; position: absolute; top: 45px; right: 80px; width: 300px; max-height: 400px; overflow-y: auto; z-index: 1000; padding: 10px;">
+                        <h5 style="margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px;">Notificaciones</h5>
+                        <div id="notification-list">
+                            <!-- Notificaciones dinámicas -->
+                        </div>
+                    </div>
+                    
+                    <span id="current-user-name">Usuario</span>
+                    <span id="current-user-role" class="badge">Rol</span>
+                    <button id="logout-btn" class="btn btn-secondary btn-sm">Salir</button>
+                </div>
+            </header>
+
+            <div class="dashboard-layout">
+                <aside class="glass-sidebar" id="sidebar-menu">
+                    <!-- Menú dinámico según el rol -->
+                </aside>
+
+                <main class="glass-content" id="main-content">
+                    <!-- Vistas dinámicas se renderizan aquí -->
+                </main>
+            </div>
+        </section>
+    </div>
+
+    <!-- Templates para las vistas -->
+    
+    <!-- Template: Vista de Administración de Usuarios -->
+    <!-- Template: Vista de Configuración (Usuarios y Sistema) -->
+    <template id="tpl-admin">
+        <div class="admin-panel" style="max-width: 1000px; margin: 0 auto;">
+            <div class="view-header" style="margin-bottom: 20px;">
+                <h3 style="display: flex; align-items: center; gap: 10px; font-size: 22px; color: var(--primary);">⚙️ Configuración del Sistema</h3>
+                <div style="background: rgba(6, 182, 212, 0.12); border: 1px solid rgba(6, 182, 212, 0.3); padding: 12px 16px; border-radius: 8px; margin-top: 12px; color: var(--text-main); font-size: 13px;">
+                    💡 Administre los usuarios, credenciales de acceso y defina exactamente qué módulos y permisos puede ver cada perfil en el sistema.
+                </div>
+            </div>
+
+            <!-- Solapas Principales Superiores: USUARIOS y SISTEMA -->
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
+                <button type="button" id="main-tab-btn-usuarios" class="btn active" onclick="switchConfigMainTab('usuarios')" style="font-size: 15px; font-weight: 700; padding: 10px 24px; border-radius: 8px; background: #0284c7; color: white; border: none; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s;">
+                    <i class="fa-solid fa-users"></i> 1. Usuarios
+                </button>
+                <button type="button" id="main-tab-btn-sistema" class="btn" onclick="switchConfigMainTab('sistema')" style="font-size: 15px; font-weight: 700; padding: 10px 24px; border-radius: 8px; background: rgba(30, 41, 59, 0.6); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s;">
+                    <i class="fa-solid fa-sliders"></i> 2. Sistema y Permisos
+                </button>
+            </div>
+
+            <!-- ================= SECCIÓN 1: USUARIOS ================= -->
+            <div id="config-section-usuarios" class="glass-card" style="padding: 0; overflow: hidden; display: block;">
+                <!-- Subtabs de Usuarios -->
+                <div style="display: flex; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.25);">
+                    <button type="button" class="admin-tab active" onclick="switchAdminTab('tab-create')" style="background: none; border: none; color: var(--text-main); padding: 14px 20px; cursor: pointer; font-weight: 600; font-size: 13px; border-bottom: 2px solid var(--primary); transition: all 0.3s;">
+                        ✨ Crear Credencial
+                    </button>
+                    <button type="button" class="admin-tab" onclick="switchAdminTab('tab-edit')" style="background: none; border: none; color: var(--text-muted); padding: 14px 20px; cursor: pointer; font-weight: 600; font-size: 13px; border-bottom: 2px solid transparent; transition: all 0.3s;">
+                        ✏️ Modificar Accesos
+                    </button>
+                    <button type="button" class="admin-tab" onclick="switchAdminTab('tab-delete')" style="background: none; border: none; color: var(--text-muted); padding: 14px 20px; cursor: pointer; font-weight: 600; font-size: 13px; border-bottom: 2px solid transparent; transition: all 0.3s;">
+                        ⛔ Bloquear / Baja
+                    </button>
+                    <button type="button" class="admin-tab" onclick="switchAdminTab('tab-user-list')" style="background: none; border: none; color: var(--text-muted); padding: 14px 20px; cursor: pointer; font-weight: 600; font-size: 13px; border-bottom: 2px solid transparent; transition: all 0.3s;">
+                        📋 Lista de Usuarios
+                    </button>
+                </div>
+
+                <div style="padding: 25px;">
+                    <!-- TAB 1: CREAR CREDENCIAL -->
+                    <div id="tab-create" class="admin-tab-content" style="display: block; animation: fadeIn 0.3s ease-out;">
+                        <form id="create-user-form">
+                            <div class="form-row" style="margin-bottom: 20px;">
+                                <div class="form-group">
+                                    <label style="color: var(--text-muted); font-size: 12px; margin-bottom: 8px;">Usuario (Nombre de acceso corto)</label>
+                                    <input type="text" id="new-username" required placeholder="Ej: jgomez" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.05); padding: 12px; height: auto;">
+                                </div>
+                                <div class="form-group">
+                                    <label style="color: var(--text-muted); font-size: 12px; margin-bottom: 8px;">Email Corporativo</label>
+                                    <input type="email" id="new-email" required placeholder="ejemplo@sgmontajes.com.ar" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.05); padding: 12px; height: auto;">
+                                </div>
+                            </div>
+                            <div class="form-row" style="margin-bottom: 20px;">
+                                <div class="form-group" style="flex: 1;">
+                                    <label style="color: var(--text-muted); font-size: 12px; margin-bottom: 8px;">Contraseña Temporal</label>
+                                    <div style="position: relative; display: flex; align-items: center;">
+                                        <input type="password" id="new-password" required placeholder="••••••••" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.05); padding: 12px; height: auto; width: 100%; padding-right: 40px;">
+                                        <button type="button" onclick="togglePassword('new-password', this)" style="position: absolute; right: 10px; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px;">👁️</button>
+                                    </div>
+                                </div>
+                                <div class="form-group" style="flex: 1;">
+                                    <label style="color: var(--text-muted); font-size: 12px; margin-bottom: 8px;">Rubro Predeterminado (Ingreso Directo)</label>
+                                    <select id="new-rubro" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.05); padding: 12px; height: 42px; width: 100%; color: white; border-radius: 6px; cursor: pointer;">
+                                        <option value="Eléctrico">⚡ Presupuesto Eléctrico</option>
+                                        <option value="Mecánico">⚙️ Presupuesto Mecánico</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div style="text-align: right; margin-top: 25px;">
+                                <button type="submit" class="btn btn-primary" style="padding: 10px 25px; font-size: 14px; font-weight: 700;">✨ Crear Credencial</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- TAB 2: MODIFICAR ACCESOS -->
+                    <div id="tab-edit" class="admin-tab-content" style="display: none; animation: fadeIn 0.3s ease-out;">
+                        <h3 style="margin-bottom: 20px; font-size: 18px;">Auditoría y Edición de Accesos</h3>
+                        <form id="edit-user-form">
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label style="color: var(--text-main); font-size: 13px; font-weight: bold; margin-bottom: 8px;">Seleccionar Empleado a Modificar</label>
+                                <select id="edit-user-select" required style="background: #ffffff; color: #000; border: none; padding: 12px; font-size: 14px; height: 45px; border-radius: 6px;">
+                                    <option value="">Seleccione un empleado...</option>
+                                </select>
+                            </div>
+
+                            <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div class="form-row" style="margin-bottom: 20px;">
+                                    <div class="form-group">
+                                        <label style="color: var(--text-muted); font-size: 12px; margin-bottom: 8px;">Usuario (Nombre)</label>
+                                        <input type="text" id="edit-username" required style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.05); padding: 12px; height: auto;">
+                                    </div>
+                                    <div class="form-group">
+                                        <label style="color: var(--text-muted); font-size: 12px; margin-bottom: 8px;">Email Corporativo</label>
+                                        <input type="email" id="edit-email" required style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.05); padding: 12px; height: auto;">
+                                    </div>
+                                </div>
+                                <div class="form-row" style="margin-bottom: 20px;">
+                                    <div class="form-group" style="flex: 1;">
+                                        <label style="color: var(--text-muted); font-size: 12px; margin-bottom: 8px;">Contraseña</label>
+                                        <div style="position: relative; display: flex; align-items: center;">
+                                            <input type="password" id="edit-password" required style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.05); padding: 12px; height: auto; width: 100%; padding-right: 40px;">
+                                            <button type="button" onclick="togglePassword('edit-password', this)" style="position: absolute; right: 10px; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px;">👁️</button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="flex: 1;">
+                                        <label style="color: var(--text-muted); font-size: 12px; margin-bottom: 8px;">Rubro Predeterminado (Ingreso Directo)</label>
+                                        <select id="edit-rubro" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.05); padding: 12px; height: 42px; width: 100%; color: white; border-radius: 6px; cursor: pointer;">
+                                            <option value="Eléctrico">⚡ Presupuesto Eléctrico</option>
+                                            <option value="Mecánico">⚙️ Presupuesto Mecánico</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div style="text-align: right; margin-top: 25px;">
+                                    <button type="submit" class="btn btn-primary" style="padding: 10px 25px; font-size: 14px; font-weight: 700;">💾 Guardar Cambios</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- TAB 3: BAJAS -->
+                    <div id="tab-delete" class="admin-tab-content" style="display: none; animation: fadeIn 0.3s ease-out;">
+                        <h3 style="margin-bottom: 20px; font-size: 18px;">Congelamiento y Baja Definitiva</h3>
+                        
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label style="color: var(--text-main); font-size: 13px; font-weight: bold; margin-bottom: 8px;">Seleccionar Empleado</label>
+                            <select id="delete-user-select" style="background: #ffffff; color: #000; border: none; padding: 12px; font-size: 14px; height: 45px; border-radius: 6px; width: 100%;">
+                                <option value="">Seleccione un empleado...</option>
+                            </select>
+                        </div>
+
+                        <div id="delete-user-warning" style="display: none; background: rgba(220, 53, 69, 0.2); border: 1px solid rgba(220, 53, 69, 0.4); padding: 16px; border-radius: 8px; margin-bottom: 20px; color: #ffcccc; font-weight: bold; font-size: 14px;">
+                            ⚠️ ATENCIÓN: Estás a punto de alterar el acceso de <span id="delete-user-name">...</span>.
+                        </div>
+
+                        <p style="font-size: 13px; color: var(--text-main); margin-bottom: 20px; line-height: 1.5;">
+                            Podés decidir quitarle todos los permisos (Congelar la cuenta para mantener el historial) o borrar por completo el registro.
+                        </p>
+                        
+                        <div style="display: flex; gap: 15px;">
+                            <button id="btn-freeze-user" type="button" class="btn" style="flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 12px; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 8px; opacity: 0.5; pointer-events: none;">
+                                ⛔ Congelar Cuenta
+                            </button>
+                            <button id="btn-delete-user" type="button" class="btn btn-danger" style="flex: 1; background: rgba(220, 53, 69, 0.8); border: 1px solid rgba(220, 53, 69, 1); color: white; padding: 12px; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 8px; opacity: 0.5; pointer-events: none;">
+                                🗑️ Eliminar Usuario
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- TAB 4: LISTA DE USUARIOS -->
+                    <div id="tab-user-list" class="admin-tab-content" style="display: none; animation: fadeIn 0.3s ease-out;">
+                        <h3 style="margin-bottom: 15px; font-size: 18px;">Usuarios Registrados en el Sistema</h3>
+                        <div style="overflow-x: auto; border: 1px solid var(--glass-border); border-radius: 8px;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                                <thead style="background: rgba(15, 23, 42, 0.9); color: var(--text-muted);">
+                                    <tr>
+                                        <th style="padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--glass-border);">Usuario</th>
+                                        <th style="padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--glass-border);">Email Corporativo</th>
+                                        <th style="padding: 10px 14px; text-align: center; border-bottom: 1px solid var(--glass-border);">Rubro Inicial</th>
+                                        <th style="padding: 10px 14px; text-align: center; border-bottom: 1px solid var(--glass-border);">Estado de Cuenta</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="config-users-table-tbody">
+                                    <!-- Dinámico -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= SECCIÓN 2: SISTEMA (PERMISOS Y VISIBILIDAD) ================= -->
+            <div id="config-section-sistema" class="glass-card" style="padding: 25px; display: none;">
+                <div style="margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;">
+                    <h4 style="margin: 0 0 6px 0; color: #38bdf8; font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-eye"></i> Matriz de Visibilidad y Permisos de Módulos
+                    </h4>
+                    <p style="margin: 0; font-size: 13px; color: var(--text-muted);">
+                        Seleccione el usuario para definir con precisión qué pantallas y herramientas puede ver y operar en el sistema.
+                    </p>
+                </div>
+
+                <!-- Banner de Confirmación de Guardado con Éxito -->
+                <div id="permisos-save-feedback-banner" style="display: none; background: rgba(16, 185, 129, 0.18); border: 1.5px solid #10b981; border-radius: 10px; padding: 14px 20px; margin-bottom: 20px; align-items: center; justify-content: space-between; gap: 12px; animation: fadeIn 0.3s ease;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 24px; color: #10b981;">✅</span>
+                        <div>
+                            <strong style="color: #6ee7b7; font-size: 15px; display: block;">¡Permisos guardados con éxito!</strong>
+                            <span id="permisos-save-feedback-text" style="color: rgba(255,255,255,0.85); font-size: 12px;">Los módulos y parámetros se actualizaron correctamente para este usuario.</span>
+                        </div>
+                    </div>
+                    <button type="button" onclick="document.getElementById('permisos-save-feedback-banner').style.display='none'" style="background: transparent; border: none; color: #6ee7b7; font-size: 18px; cursor: pointer; padding: 4px;">✕</button>
+                </div>
+
+                <!-- Selector de Usuario para configurar permisos y Resumen Activo -->
+                <div style="background: rgba(15, 23, 42, 0.7); border: 1.5px solid var(--glass-border); border-radius: 10px; padding: 16px 20px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 14px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span style="font-weight: 700; color: white; font-size: 14px;">👤 Seleccionar Usuario:</span>
+                            <select id="config-permisos-user-select" onchange="cargarPermisosParaUsuario(this.value)" style="background: rgba(30, 41, 59, 0.95); color: #38bdf8; border: 1.5px solid #0284c7; padding: 6px 14px; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; min-width: 220px;">
+                                <!-- Opciones cargadas dinámicamente -->
+                            </select>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button type="button" class="btn btn-sm" onclick="seleccionarTodosPermisos(true)" style="background: rgba(2,132,199,0.2); color: #38bdf8; border: 1px solid #0284c7; font-weight: 700; font-size: 12px; padding: 6px 14px; border-radius: 6px; cursor: pointer;">
+                                <i class="fa-solid fa-check-double"></i> Marcar Todos
+                            </button>
+                            <button type="button" class="btn btn-sm" onclick="seleccionarTodosPermisos(false)" style="background: rgba(244,63,94,0.15); color: #fda4af; border: 1px solid #f43f5e; font-weight: 700; font-size: 12px; padding: 6px 14px; border-radius: 6px; cursor: pointer;">
+                                <i class="fa-solid fa-ban"></i> Desmarcar Todos
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Panel de Información y Parámetros del Usuario Seleccionado -->
+                    <div id="config-user-params-summary" style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                        <div style="display: flex; align-items: center; gap: 14px; font-size: 12px;">
+                            <span style="color: var(--text-muted);">Usuario: <strong id="summary-perm-username" style="color: #38bdf8;">mel</strong></span>
+                            <span style="color: var(--text-muted);">Rol: <strong id="summary-perm-role" style="color: #ffffff;">Administrador</strong></span>
+                            <span style="color: var(--text-muted);">Rubro Inicial: <strong id="summary-perm-rubro" style="color: #fde047;">⚡ Eléctrico</strong></span>
+                            <span style="color: var(--text-muted);">Email: <strong id="summary-perm-email" style="color: #ffffff;">-</strong></span>
+                        </div>
+                        <div id="summary-perm-count-badge" style="background: #10b981; color: white; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; gap: 6px;">
+                            ⚡ 6 de 6 Módulos Habilitados
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de Módulos con Checkboxes Interactivos -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
+                    <label id="card-perm-menu-ingresar" class="glass-card perm-card" style="display: flex; align-items: center; justify-content: space-between; padding: 14px; margin: 0; cursor: pointer; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 23, 42, 0.5); border-radius: 10px; transition: all 0.2s;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <input type="checkbox" id="perm-menu-ingresar" class="perm-checkbox" value="menu-ingresar" onchange="onPermisoCheckboxChange()" style="width: 18px; height: 18px; accent-color: #10b981; cursor: pointer;">
+                            <div>
+                                <strong style="display: block; color: white; font-size: 13px;">📝 Gestión de Presupuestos</strong>
+                                <span style="font-size: 11px; color: var(--text-muted);">Creación y carga de presupuestos Mecánicos y Eléctricos</span>
+                            </div>
+                        </div>
+                        <span id="badge-perm-menu-ingresar" class="perm-status-badge" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px;">-</span>
+                    </label>
+
+                    <label id="card-perm-menu-asignaciones" class="glass-card perm-card" style="display: flex; align-items: center; justify-content: space-between; padding: 14px; margin: 0; cursor: pointer; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 23, 42, 0.5); border-radius: 10px; transition: all 0.2s;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <input type="checkbox" id="perm-menu-asignaciones" class="perm-checkbox" value="menu-asignaciones" onchange="onPermisoCheckboxChange()" style="width: 18px; height: 18px; accent-color: #10b981; cursor: pointer;">
+                            <div>
+                                <strong style="display: block; color: white; font-size: 13px;">✅ Autorización de Presupuestos</strong>
+                                <span style="font-size: 11px; color: var(--text-muted);">Aprobar o rechazar presupuestos pendientes</span>
+                            </div>
+                        </div>
+                        <span id="badge-perm-menu-asignaciones" class="perm-status-badge" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px;">-</span>
+                    </label>
+
+                    <label id="card-perm-menu-estado-presupuesto" class="glass-card perm-card" style="display: flex; align-items: center; justify-content: space-between; padding: 14px; margin: 0; cursor: pointer; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 23, 42, 0.5); border-radius: 10px; transition: all 0.2s;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <input type="checkbox" id="perm-menu-estado-presupuesto" class="perm-checkbox" value="menu-estado-presupuesto" onchange="onPermisoCheckboxChange()" style="width: 18px; height: 18px; accent-color: #10b981; cursor: pointer;">
+                            <div>
+                                <strong style="display: block; color: white; font-size: 13px;">📊 Estado del Presupuesto</strong>
+                                <span style="font-size: 11px; color: var(--text-muted);">Cambio rápido de estados y registro de OC</span>
+                            </div>
+                        </div>
+                        <span id="badge-perm-menu-estado-presupuesto" class="perm-status-badge" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px;">-</span>
+                    </label>
+
+                    <label id="card-perm-menu-rechazados" class="glass-card perm-card" style="display: flex; align-items: center; justify-content: space-between; padding: 14px; margin: 0; cursor: pointer; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 23, 42, 0.5); border-radius: 10px; transition: all 0.2s;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <input type="checkbox" id="perm-menu-rechazados" class="perm-checkbox" value="menu-rechazados" onchange="onPermisoCheckboxChange()" style="width: 18px; height: 18px; accent-color: #10b981; cursor: pointer;">
+                            <div>
+                                <strong style="display: block; color: white; font-size: 13px;">❌ Rechazo de Presupuesto</strong>
+                                <span style="font-size: 11px; color: var(--text-muted);">Bandeja exclusiva de presupuestos no aprobados</span>
+                            </div>
+                        </div>
+                        <span id="badge-perm-menu-rechazados" class="perm-status-badge" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px;">-</span>
+                    </label>
+
+                    <label id="card-perm-menu-all" class="glass-card perm-card" style="display: flex; align-items: center; justify-content: space-between; padding: 14px; margin: 0; cursor: pointer; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 23, 42, 0.5); border-radius: 10px; transition: all 0.2s;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <input type="checkbox" id="perm-menu-all" class="perm-checkbox" value="menu-all" onchange="onPermisoCheckboxChange()" style="width: 18px; height: 18px; accent-color: #10b981; cursor: pointer;">
+                            <div>
+                                <strong style="display: block; color: white; font-size: 13px;">🕒 Seguimiento</strong>
+                                <span style="font-size: 11px; color: var(--text-muted);">Seguimiento, historial y modificación de presupuestos</span>
+                            </div>
+                        </div>
+                        <span id="badge-perm-menu-all" class="perm-status-badge" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px;">-</span>
+                    </label>
+
+                    <label id="card-perm-menu-admin" class="glass-card perm-card" style="display: flex; align-items: center; justify-content: space-between; padding: 14px; margin: 0; cursor: pointer; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 23, 42, 0.5); border-radius: 10px; transition: all 0.2s;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <input type="checkbox" id="perm-menu-admin" class="perm-checkbox" value="menu-admin" onchange="onPermisoCheckboxChange()" style="width: 18px; height: 18px; accent-color: #10b981; cursor: pointer;">
+                            <div>
+                                <strong style="display: block; color: white; font-size: 13px;">⚙️ Configuración del Sistema</strong>
+                                <span style="font-size: 11px; color: var(--text-muted);">Acceso a este panel de administración de usuarios y sistema</span>
+                            </div>
+                        </div>
+                        <span id="badge-perm-menu-admin" class="perm-status-badge" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px;">-</span>
+                    </label>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-bottom: 30px;">
+                    <button id="btn-guardar-permisos-usuario" type="button" class="btn btn-primary" onclick="guardarPermisosUsuarioActual()" style="padding: 12px 28px; font-weight: 800; font-size: 14px; border-radius: 8px; background: #0284c7; border-color: #0284c7; cursor: pointer; box-shadow: 0 4px 14px rgba(2,132,199,0.35); display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar Permisos para este Usuario
+                    </button>
+                </div>
+
+                <!-- Configuración de Correo para Alertas de Facturación y Aprobaciones -->
+                <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; margin-bottom: 25px;">
+                    <h4 style="margin: 0 0 6px 0; color: #2dd4bf; font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-envelope"></i> Configuración de Alertas por Email
+                    </h4>
+                    <p style="margin: 0 0 15px 0; font-size: 12px; color: var(--text-muted);">
+                        Indique la casilla de correo del responsable de emitir facturas cuando se cargan avances de obra.
+                    </p>
+
+                    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 15px; align-items: flex-end;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="color: white; font-size: 12px; font-weight: 700;">Casilla de Correo - Facturación (Avance de Obra):</label>
+                            <input type="email" id="sys-config-email-facturacion" placeholder="facturacion@sgmontajes.com.ar" style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--glass-border); padding: 10px 14px; color: #2dd4bf; font-weight: 700;">
+                        </div>
+                        <button type="button" class="btn" onclick="guardarEmailFacturacionConfig()" style="background: #0d9488; color: white; height: 42px; font-weight: 700;">
+                            <i class="fa-solid fa-save"></i> Guardar Email de Facturación
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template: Ingreso de Pedido (Solicitante) -->
+    <template id="tpl-request-ped">
+        <form id="form-request-ped" class="glass-card" style="padding: 24px; display: flex; flex-direction: column; gap: 20px; max-width: 1400px; margin: 0 auto; padding-bottom: 25px;" novalidate>
+            
+            <!-- Step Indicator -->
+            <div class="step-indicator" style="display: flex; justify-content: space-between; margin-bottom: 15px; position: relative;">
+                <div style="position: absolute; top: 15px; left: 16.6%; right: 16.6%; height: 2px; background: rgba(255,255,255,0.08); z-index: 1;"></div>
+                <div id="step-line-progress" style="position: absolute; top: 15px; left: 16.6%; width: 0%; height: 2px; background: var(--primary); z-index: 2; transition: var(--transition);"></div>
+                
+                <div class="step-node active" id="step-node-1" style="display: flex; flex-direction: column; align-items: center; z-index: 3; flex: 1;">
+                    <div class="step-circle" style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: black; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; box-shadow: 0 0 10px var(--primary); transition: var(--transition);">1</div>
+                    <span style="font-size: 11px; margin-top: 8px; font-weight: 600; color: var(--primary);">1. Encabezado</span>
+                </div>
+                <div class="step-node" id="step-node-2" style="display: flex; flex-direction: column; align-items: center; z-index: 3; flex: 1;">
+                    <div class="step-circle" style="width: 32px; height: 32px; border-radius: 50%; background: #1e293b; color: var(--text-muted); border: 2px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; transition: var(--transition);">2</div>
+                    <span id="step-label-2" style="font-size: 11px; margin-top: 8px; font-weight: 600; color: var(--text-muted);">2. Artículos</span>
+                </div>
+                <div class="step-node" id="step-node-3" style="display: flex; flex-direction: column; align-items: center; z-index: 3; flex: 1;">
+                    <div class="step-circle" style="width: 32px; height: 32px; border-radius: 50%; background: #1e293b; color: var(--text-muted); border: 2px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; transition: var(--transition);">3</div>
+                    <span style="font-size: 11px; margin-top: 8px; font-weight: 600; color: var(--text-muted);">3. Confirmación</span>
+                </div>
+            </div>
+
+            <!-- Hidden Inputs for Additional Data (Modal) -->
+            <input type="checkbox" id="req-is-comisionista" style="display: none;">
+            <input type="hidden" id="req-tipo-nv-val" value="Presupuesto Consignacion">
+            <input type="hidden" id="req-tipo-entrega-val" value="Retira Cliente">
+            <input type="hidden" id="req-forma-pago-val" value="Pago Cheque">
+
+            <!-- Paso 1: Encabezado del Pedido -->
+            <div id="step-container-1" style="display: flex; flex-direction: column; gap: 20px;">
+                <div class="view-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
+                    <div>
+                        <h4 style="display: flex; align-items: center; gap: 8px; color: var(--primary); font-size: 16px; margin: 0;">
+                            <i class="fa-solid fa-file-signature"></i> <span id="step1-title-text">Gestión de Presupuestos</span>
+                        </h4>
+                        <p style="font-size: 12px; color: var(--text-muted); margin: 4px 0 0 0;" id="step1-subtitle-text">Defina los parámetros comerciales principales de la transacción.</p>
+                    </div>
+                    <div id="tipo-presupuesto-badge-container" style="display: flex; align-items: center; gap: 10px;">
+                        <span id="tipo-presupuesto-badge" class="badge" style="background: rgba(234, 179, 8, 0.2); color: #fde047; font-size: 13px; padding: 6px 14px; border: 1px solid rgba(234, 179, 8, 0.4); border-radius: 8px; font-weight: 700;">
+                            ⚡ Presupuesto Eléctrico
+                        </span>
+                        <button type="button" class="btn btn-sm btn-outline" onclick="abrirModalTipoPresupuesto()" style="font-size: 11px; padding: 4px 10px; border-radius: 6px;">
+                            <i class="fa-solid fa-arrows-rotate"></i> Cambiar Rubro
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="metadata-grid-cols">
+                    <input type="hidden" value="SOLICI_PED">
+                    
+                    <div id="req-standard-fields" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; grid-column: span 3; width: 100%;">
+                        <!-- Cliente (Spans Columns 1 and 2) -->
+                        <div class="form-group" style="position: relative; margin-bottom: 0; grid-column: span 2;">
+                            <label>Cliente <span style="color: var(--primary);">*</span></label>
+                            <div style="position: relative; display: flex; align-items: center;">
+                                <input type="text" id="req-client" autocomplete="off" placeholder="Escriba nombre o CUIT..." required style="padding-right: 35px; height: 42px;">
+                                <i class="fas fa-search" style="position: absolute; right: 12px; color: var(--primary); cursor: pointer;" onclick="abrirRobotF6()"></i>
+                            </div>
+                            <div id="req-client-dropdown" class="custom-dropdown" style="display: none;"></div>
+                        </div>
+                        
+                        <!-- Depósito (Column 3) -->
+                        <div class="form-group" style="position: relative; margin-bottom: 0;">
+                            <label>Depósito <span style="color: var(--primary);">*</span></label>
+                            <div style="position: relative; display: flex; align-items: center;">
+                                <input type="text" id="req-deposit-input" autocomplete="off" placeholder="Buscar depósito..." required style="padding-right: 35px; height: 42px;">
+                                <i class="fas fa-search" style="position: absolute; right: 12px; color: var(--primary); cursor: pointer;" onclick="abrirRobotDepositos()"></i>
+                            </div>
+                            <div id="req-deposit-dropdown" class="custom-dropdown" style="display: none;"></div>
+                        </div>
+
+                        <!-- Condición de Venta (Column 1) -->
+                        <div class="form-group" style="position: relative; margin-bottom: 0;">
+                            <label>Condición de Venta <span style="color: var(--primary);">*</span></label>
+                            <div style="position: relative; display: flex; align-items: center;">
+                                <input type="text" id="req-condition-input" autocomplete="off" placeholder="Buscar condición..." required style="padding-right: 35px; height: 42px; cursor: pointer;">
+                                <i class="fas fa-search" style="position: absolute; right: 12px; color: var(--primary); cursor: pointer;" onclick="abrirRobotCondiciones()"></i>
+                            </div>
+                            <div id="req-condition-dropdown" class="custom-dropdown" style="display: none;"></div>
+                            <!-- Campo oculto para guardar el código seleccionado de la condición de venta -->
+                            <input type="hidden" id="req-condition" name="req-condition" value="">
+                        </div>
+
+                        <!-- Moneda & Cotización (Column 2) -->
+                        <div class="form-row" style="gap: 15px; margin-bottom: 0;">
+                            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                                <label>Moneda</label>
+                                <select id="req-currency" required onchange="onReqCurrencyChange()" style="cursor: pointer; height: 42px;">
+                                    <option value="1">1 - Pesos</option>
+                                    <option value="2">2 - Dólares</option>
+                                    <option value="60">60 - Euros</option>
+                                </select>
+                            </div>
+                            <div id="req-exchange-rate-container" class="form-group" style="display: none; flex: 1; margin-bottom: 0;">
+                                <label>Cotización</label>
+                                <input type="text" id="req-exchange-rate" value="1.00000000" style="font-family: monospace; text-align: right; height: 42px;">
+                            </div>
+                        </div>
+
+                        <!-- Transporte (Column 3) -->
+                        <div class="form-group" style="position: relative; margin-bottom: 0;">
+                            <label>Transporte <span style="color: var(--primary);">*</span></label>
+                            <div style="position: relative; display: flex; align-items: center;">
+                                <input type="text" id="req-transport-input" autocomplete="off" placeholder="Buscar transporte..." required style="padding-right: 35px; height: 42px;">
+                                <i class="fas fa-search" style="position: absolute; right: 12px; color: var(--primary); cursor: pointer;" onclick="abrirRobotTransportes()"></i>
+                            </div>
+                            <div id="req-transport-dropdown" class="custom-dropdown" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Campos Específicos para Presupuesto Mecánico (Formato Ficha Excel Oficial) -->
+                    <div id="req-mecanico-fields" style="display: none; grid-column: span 3; background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; overflow: hidden; margin-top: 10px; color: var(--text-main); box-shadow: var(--glass-shadow);">
+                        <!-- Header Tabla Azul Excel -->
+                        <div style="background: rgba(6, 182, 212, 0.15); color: #22d3ee; font-weight: 800; font-size: 14px; padding: 12px 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="background: #0891b2; color: white; border-radius: 4px; padding: 2px 8px; font-size: 12px; font-weight: 800;">1</span>
+                                <span style="text-decoration: underline; letter-spacing: 0.5px;">IDENTIFICACIÓN DE LA OFERTA</span>
+                            </div>
+                            <span style="font-size: 11px; font-weight: bold; color: #22d3ee;">✏️ Ingrese a mano los datos del encabezado</span>
+                        </div>
+                        
+                        <!-- Grilla de Campos Identificación de la Oferta -->
+                        <div style="padding: 15px; display: flex; flex-direction: column; gap: 12px; background: transparent;">
+                            <!-- i. Denominación del Servicio -->
+                            <div style="display: grid; grid-template-columns: 240px 1fr; gap: 10px; align-items: center;">
+                                <label id="lbl-meca-denominacion" style="font-size: 12px; font-style: italic; font-weight: 700; color: rgba(255,255,255,0.75);">i. <u>Denominación del Servicio:</u></label>
+                                <input type="text" id="req-meca-denominacion" value="" placeholder="Completar denominación del servicio..." style="background: rgba(234, 179, 8, 0.08); color: #ffffff; border: 1.5px solid rgba(234, 179, 8, 0.35); border-radius: 6px; padding: 8px 12px; font-size: 13px; font-weight: 700;" onkeydown="if(event.key==='Enter'){event.preventDefault();abrirRobotF6();}">
+                            </div>
+
+                            <!-- ii. Cliente -->
+                            <div style="display: grid; grid-template-columns: 240px 1fr; gap: 10px; align-items: center;">
+                                <label id="lbl-meca-cliente" style="font-size: 12px; font-style: italic; font-weight: 700; color: rgba(255,255,255,0.75); cursor: pointer;" onclick="abrirRobotF6()">ii. <u>Cliente (F6 / Lupa):</u></label>
+                                <div style="position: relative; width: 100%; display: flex; align-items: center; cursor: pointer;" onclick="abrirRobotF6()">
+                                    <input type="text" id="req-meca-cliente" readonly placeholder="Ej: CARGILL SACI (Clic aquí para elegir o F6)" value="CARGILL SACI" style="width: 100%; background: rgba(234, 179, 8, 0.08); color: #ffffff; border: 1.5px solid rgba(234, 179, 8, 0.35); border-radius: 6px; padding: 8px 36px 8px 12px; font-size: 13px; font-weight: 700; cursor: pointer;" onclick="abrirRobotF6()" onkeydown="if(event.key==='Enter'){event.preventDefault();abrirRobotF6();}">
+                                    <i class="fas fa-search" style="position: absolute; right: 12px; color: #22d3ee; cursor: pointer; font-size: 14px;" onclick="abrirRobotF6()" title="Buscar Clientes (F6)"></i>
+                                </div>
+                            </div>
+
+                            <!-- iii. Nombre del Proveedor -->
+                            <div style="display: grid; grid-template-columns: 240px 1fr; gap: 10px; align-items: center;">
+                                <label id="lbl-meca-proveedor" style="font-size: 12px; font-style: italic; font-weight: 700; color: rgba(255,255,255,0.75); cursor: pointer;" onclick="abrirRobotProveedores()">iii. <u>Nombre del Proveedor (F6 / Lupa):</u></label>
+                                <div style="position: relative; width: 100%; display: flex; align-items: center; cursor: pointer;" onclick="abrirRobotProveedores()">
+                                    <input type="text" id="req-meca-proveedor" readonly placeholder="SG MONTAJES SRL o ACOSTA SERVICIO (Clic aquí para elegir o F6)" value="SG MONTAJES SRL" style="width: 100%; background: rgba(234, 179, 8, 0.08); color: #ffffff; border: 1.5px solid rgba(234, 179, 8, 0.35); border-radius: 6px; padding: 8px 36px 8px 12px; font-size: 13px; font-weight: 700; cursor: pointer;" onclick="abrirRobotProveedores()" onkeydown="if(event.key==='Enter'){event.preventDefault();abrirRobotProveedores();}">
+                                    <i class="fas fa-search" style="position: absolute; right: 12px; color: #22d3ee; cursor: pointer; font-size: 14px;" onclick="abrirRobotProveedores()" title="Seleccionar Proveedor (F6)"></i>
+                                </div>
+                            </div>
+
+                            <!-- iv. Fecha de Oferta -->
+                            <div style="display: grid; grid-template-columns: 240px 1fr; gap: 10px; align-items: center;">
+                                <label id="lbl-meca-fecha-oferta" style="font-size: 12px; font-style: italic; font-weight: 700; color: rgba(255,255,255,0.75);">iv. <u>Fecha de Oferta:</u></label>
+                                <input type="date" id="req-meca-fecha-oferta" style="background: rgba(234, 179, 8, 0.08); color: #ffffff; border: 1.5px solid rgba(234, 179, 8, 0.35); border-radius: 6px; padding: 8px 12px; font-size: 13px; font-weight: 700;" onkeydown="if(event.key==='Enter'){event.preventDefault();const valEl=document.getElementById('req-meca-validez');if(valEl){valEl.focus();valEl.select();}}">
+                            </div>
+
+                            <!-- v. Validez de la Oferta -->
+                            <div style="display: grid; grid-template-columns: 240px 1fr; gap: 10px; align-items: center;">
+                                <label id="lbl-meca-validez" style="font-size: 12px; font-style: italic; font-weight: 700; color: rgba(255,255,255,0.75);">v. <u>Validez de la Oferta:</u></label>
+                                <input type="text" id="req-meca-validez" placeholder="Ej: 5 días" style="background: rgba(234, 179, 8, 0.08); color: #ffffff; border: 1.5px solid rgba(234, 179, 8, 0.35); border-radius: 6px; padding: 8px 12px; font-size: 13px;" onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('req-meca-planta')?.focus();}">
+                            </div>
+
+                            <!-- vi. Planta de Cargill -->
+                            <div style="display: grid; grid-template-columns: 240px 1fr; gap: 10px; align-items: center;">
+                                <label id="lbl-meca-planta" style="font-size: 12px; font-style: italic; font-weight: 700; color: rgba(255,255,255,0.75);">vi. <u>Planta de Cargill:</u></label>
+                                <select id="req-meca-planta" style="background: rgba(234, 179, 8, 0.08); color: #ffffff; border: 1.5px solid rgba(234, 179, 8, 0.35); border-radius: 6px; padding: 8px 12px; font-size: 13px; font-weight: 700; cursor: pointer;" onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('req-meca-fecha-inicio')?.focus();}">
+                                    <option value="VGG" style="background: #1e293b; color: white;">VGG</option>
+                                    <option value="PGSM" style="background: #1e293b; color: white;">PGSM</option>
+                                </select>
+                            </div>
+
+                            <!-- vii. Fecha estimada de Inicio -->
+                            <div style="display: grid; grid-template-columns: 240px 1fr; gap: 10px; align-items: center;">
+                                <label id="lbl-meca-inicio" style="font-size: 12px; font-style: italic; font-weight: 700; color: rgba(255,255,255,0.75);">vii. <u>Fecha estimada de Inicio:</u></label>
+                                <input type="date" id="req-meca-fecha-inicio" style="background: rgba(234, 179, 8, 0.08); color: #ffffff; border: 1.5px solid rgba(234, 179, 8, 0.35); border-radius: 6px; padding: 8px 12px; font-size: 13px; font-weight: 700;" onkeydown="if(event.key==='Enter'){event.preventDefault();const durEl=document.getElementById('req-meca-duracion');if(durEl){durEl.focus();durEl.select();}}">
+                            </div>
+
+                            <!-- viii. Duración estimada de la Ejecución -->
+                            <div style="display: grid; grid-template-columns: 240px 1fr; gap: 10px; align-items: center;">
+                                <label id="lbl-meca-duracion" style="font-size: 12px; font-style: italic; font-weight: 700; color: rgba(255,255,255,0.75);">viii. <u>Duración estimada de la Ejecución:</u></label>
+                                <input type="text" id="req-meca-duracion" placeholder="Ej: 25-30días" style="background: rgba(234, 179, 8, 0.08); color: #ffffff; border: 1.5px solid rgba(234, 179, 8, 0.35); border-radius: 6px; padding: 8px 12px; font-size: 13px;" onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('req-meca-fecha-fin')?.focus();}">
+                            </div>
+
+                            <!-- ix. Plazo Máximo de Finalización -->
+                            <div style="display: grid; grid-template-columns: 240px 1fr; gap: 10px; align-items: center;">
+                                <label id="lbl-meca-fin" style="font-size: 12px; font-style: italic; font-weight: 700; color: rgba(255,255,255,0.75);">ix. <u>Plazo Máximo de Finalización:</u></label>
+                                <input type="date" id="req-meca-fecha-fin" style="background: rgba(234, 179, 8, 0.08); color: #ffffff; border: 1.5px solid rgba(234, 179, 8, 0.35); border-radius: 6px; padding: 8px 12px; font-size: 13px; font-weight: 700;" onkeydown="if(event.key==='Enter'){event.preventDefault();const pBox=document.getElementById('req-meca-propuesta-box');if(pBox&&pBox.style.display!=='none'){document.getElementById('req-meca-propuesta')?.focus();}else{document.getElementById('btn-next-step1')?.click();}}">
+                            </div>
+                        </div>
+
+                            <!-- 2. PROPUESTA TÉCNICA (DESCRIPCIÓN) -->
+                            <div id="req-meca-propuesta-box" style="border-top: 1px solid rgba(255, 255, 255, 0.08); margin-top: 10px; padding-top: 10px; display: flex; flex-direction: column; gap: 12px;">
+                                <div style="background: rgba(6, 182, 212, 0.15); color: #22d3ee; font-weight: 800; font-size: 13px; padding: 6px 10px; border-radius: 6px; display: flex; align-items: center; gap: 8px;">
+                                    <span style="background: #0891b2; color: white; border-radius: 4px; padding: 1px 6px; font-size: 11px;">2</span>
+                                    <span style="text-decoration: underline;">PROPUESTA TÉCNICA (DESCRIPCIÓN)</span>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 240px 1fr; gap: 10px;">
+                                    <label style="font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.75);">DETALLAR PROPUESTA:</label>
+                                    <textarea id="req-meca-propuesta" rows="2" placeholder="Detallar la propuesta técnica..." style="background: rgba(234, 179, 8, 0.08); color: #ffffff; border: 1.5px solid rgba(234, 179, 8, 0.35); border-radius: 6px; padding: 8px; font-size: 12px; resize: vertical;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();const pEl=document.getElementById('req-meca-personal');if(pEl){pEl.focus();pEl.select();}}"></textarea>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 270px 1fr; gap: 10px; align-items: center;">
+                                    <label style="font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.75);">CANT DE PERSONAL DESTINADO A CUBRIR LA TAREA:</label>
+                                    <input type="text" id="req-meca-personal" placeholder="Completar cantidad..." style="background: rgba(234, 179, 8, 0.08); color: #ffffff; border: 1.5px solid rgba(234, 179, 8, 0.35); border-radius: 6px; padding: 8px 12px; font-size: 12px;" onkeydown="if(event.key==='Enter'){event.preventDefault();const exEl=document.getElementById('req-meca-exclusiones');if(exEl){exEl.focus();exEl.select();}}">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 240px 1fr; gap: 10px; align-items: center;">
+                                    <label style="font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.75);">INDICAR EXCLUSIONES:</label>
+                                    <input type="text" id="req-meca-exclusiones" placeholder="Completar exclusiones..." style="background: rgba(234, 179, 8, 0.08); color: #ffffff; border: 1.5px solid rgba(234, 179, 8, 0.35); border-radius: 6px; padding: 8px 12px; font-size: 12px;" onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('btn-next-step1')?.click();}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px; display: flex; justify-content: flex-end; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 15px;">
+                    <button type="button" id="btn-next-step1" onclick="onEncabezadoNext()" style="min-width: 220px; height: 42px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        Siguiente: Artículos <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Paso 2: Artículos del Pedido (Antes Paso 3) -->
+            <div id="step-container-2" style="display: none; flex-direction: column; gap: 20px;">
+                <div class="view-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
+                    <div>
+                        <h4 style="color: var(--primary); font-size: 16px; margin: 0; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-cubes"></i> <span id="step2-title-text">Detalle de Artículos del Presupuesto</span>
+                        </h4>
+                        <p style="font-size: 12px; color: var(--text-muted); margin: 4px 0 0 0;" id="step2-subtitle-text">Agregue y configure los productos del presupuesto.</p>
+                    </div>
+                    <div style="font-size: 13px; font-weight: 700; color: var(--text-main); background: rgba(6, 182, 212, 0.15); border: 1px solid var(--glass-border); padding: 5px 12px; border-radius: 8px; box-shadow: var(--glass-shadow); display: flex; align-items: center; gap: 6px;">
+                        Total del Presupuesto: <span id="req-total-nv-display" style="color: var(--primary); font-family: monospace; font-size: 14px;">$0,00</span>
+                    </div>
+                </div>
+                
+                <div id="req-standard-step2-container" style="display: flex; flex-direction: column; gap: 20px; width: 100%;">
+                    <!-- Quick Add Form Panel -->
+                    <div class="request-ped-quick-add" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; display: grid; grid-template-columns: 3fr 1fr 1fr auto; gap: 15px; align-items: flex-end;">
+                        <div class="form-group" style="margin-bottom: 0; position: relative;">
+                            <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">Artículo de Stock (F6 / Lupa)</label>
+                            <div style="position: relative; display: flex; align-items: center;">
+                                <input type="text" id="req-product-input" autocomplete="off" placeholder="Escriba código o detalle para buscar..." style="height: 38px; padding-right: 35px;">
+                                <i class="fas fa-search" style="position: absolute; right: 12px; color: var(--primary); cursor: pointer;" onclick="abrirRobotStock()"></i>
+                            </div>
+                            <div id="req-product-dropdown" class="custom-dropdown" style="display: none;"></div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">Cantidad</label>
+                            <input type="number" id="req-product-qty" min="0.01" step="any" placeholder="Cant." style="height: 38px;" onwheel="this.blur()" onkeydown="if(['e','E','+','-'].includes(event.key)) event.preventDefault();">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">Precio Unit. ($)</label>
+                            <input type="text" inputmode="decimal" id="req-product-price" placeholder="Precio" style="height: 38px;" onkeydown="if(event.key==='.'){event.preventDefault();if(!this.value.includes(',')){const s=this.selectionStart,e=this.selectionEnd;this.value=this.value.substring(0,s)+','+this.value.substring(e);this.setSelectionRange(s+1,s+1);}}else if(['e','E','+','-','/'].includes(event.key)){event.preventDefault();}else if(event.key===','&&this.value.includes(',')){event.preventDefault();}" oninput="this.value=this.value.replace(/\./g,',').replace(/[^0-9,]/g,'');const p=this.value.split(',');if(p.length>2)this.value=p[0]+','+p.slice(1).join('');">
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="agregarArticuloDetalle()" style="height: 38px; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 16px;">
+                            <i class="fas fa-plus"></i> Agregar Artículo
+                        </button>
+                    </div>
+                    
+                    <!-- Table of items -->
+                    <div class="table-responsive" style="max-height: 280px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; background: rgba(0,0,0,0.2);">
+                        <table class="data-table" style="width: 100%; border-collapse: collapse; margin: 0;">
+                            <thead>
+                                <tr style="background: rgba(15, 23, 42, 0.5);">
+                                    <th style="padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.08);">Código</th>
+                                    <th style="padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.08);">Descripción</th>
+                                    <th style="text-align: right; width: 120px; padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.08);">Precio Unit.</th>
+                                    <th style="text-align: right; width: 110px; padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.08);">Cantidad</th>
+                                    <th style="text-align: right; width: 130px; padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.08);">Subtotal</th>
+                                    <th style="text-align: center; width: 60px; padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.08);">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="req-items-list">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 20px; font-style: italic; background: rgba(0,0,0,0.1);">
+                                        No se han agregado artículos al detalle.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Contenedor Alternativo para el Excel Tarifario del Presupuesto Mecánico -->
+                <div id="req-mecanico-step2-container" style="display: none; flex-direction: column; gap: 20px; width: 100%;">
+                    <!-- Se llenará de forma dinámica con la grilla Excel de la propuesta comercial -->
+                </div>
+
+                <div style="margin-top: 15px; display: flex; justify-content: space-between; gap: 15px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 15px;">
+                    <button type="button" class="btn btn-outline" onclick="goToRequestStep(1)" style="min-width: 120px; height: 42px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                        <i class="fas fa-arrow-left"></i> Atrás
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="goToRequestStep(3)" style="min-width: 220px; height: 42px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        Siguiente: Confirmar <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Paso 3: Confirmación y Resumen (Antes Paso 4) -->
+            <div id="step-container-3" style="display: none; flex-direction: column; gap: 20px;">
+                <div class="view-header" style="margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
+                    <h4 style="display: flex; align-items: center; gap: 8px; color: var(--primary); font-size: 16px; margin: 0;">
+                        <i class="fa-solid fa-clipboard-check"></i> Resumen del Presupuesto
+                    </h4>
+                    <p style="font-size: 12px; color: var(--text-muted); margin: 4px 0 0 0;">Verifique los datos cargados antes de enviar el Presupuesto a autorización.</p>
+                </div>
+
+                <!-- Grid de Resumen -->
+                <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px;">
+                    <!-- Caja de Datos Resumidos Estándar (Eléctrico) -->
+                    <div id="summary-standard-box" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 13px;">
+                        <div>
+                            <span style="color: var(--text-muted); font-size: 11px; display: block; margin-bottom: 2px;">CLIENTE</span>
+                            <strong id="summary-client" style="color: white; font-size: 14px;">-</strong>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-muted); font-size: 11px; display: block; margin-bottom: 2px;">CONDICIÓN DE VENTA</span>
+                            <strong id="summary-condition" style="color: white;">-</strong>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-muted); font-size: 11px; display: block; margin-bottom: 2px;">MONEDA / CAMBIO</span>
+                            <strong id="summary-currency" style="color: white;">-</strong>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-muted); font-size: 11px; display: block; margin-bottom: 2px;">DEPÓSITO</span>
+                            <strong id="summary-deposit" style="color: white;">-</strong>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-muted); font-size: 11px; display: block; margin-bottom: 2px;">TRANSPORTE</span>
+                            <strong id="summary-transport" style="color: white;">-</strong>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-muted); font-size: 11px; display: block; margin-bottom: 2px;">CANTIDAD</span>
+                            <strong id="summary-items-count" style="color: white; font-size: 14px;">0</strong>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-muted); font-size: 11px; display: block; margin-bottom: 2px;">MODALIDAD DE ENTREGA</span>
+                            <strong id="summary-tipo-entrega" style="color: white;">-</strong>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-muted); font-size: 11px; display: block; margin-bottom: 2px;">FORMA DE PAGO</span>
+                            <strong id="summary-forma-pago" style="color: white;">-</strong>
+                        </div>
+                    </div>
+
+                    <!-- Caja de Datos Resumidos Mecánico (Ficha Excel) -->
+                    <div id="summary-mecanico-box" style="display: none; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 13px;">
+                        <div style="grid-column: span 2;">
+                            <span style="color: var(--primary); font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">1. IDENTIFICACIÓN DE LA OFERTA</span>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-muted); font-size: 11px; display: block; margin-bottom: 2px;">DENOMINACIÓN DEL SERVICIO</span>
+                            <strong id="summary-meca-denominacion" style="color: white;">-</strong>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-muted); font-size: 11px; display: block; margin-bottom: 2px;">NOMBRE DEL PROVEEDOR</span>
+                            <strong id="summary-meca-proveedor" style="color: white;">-</strong>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-muted); font-size: 11px; display: block; margin-bottom: 2px;">FECHA DE OFERTA</span>
+                            <strong id="summary-meca-fecha-oferta" style="color: white;">-</strong>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-muted); font-size: 11px; display: block; margin-bottom: 2px;">VALIDEZ DE LA OFERTA</span>
+                            <strong id="summary-meca-validez" style="color: white;">-</strong>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-muted); font-size: 11px; display: block; margin-bottom: 2px;">PLANTA DE CARGILL</span>
+                            <strong id="summary-meca-planta" style="color: white;">-</strong>
+                        </div>
+                        <div>
+                            <span id="lbl-summary-meca-inicio" style="color: var(--text-muted); font-size: 11px; display: block; margin-bottom: 2px;">FECHA ESTIMADA DE INICIO</span>
+                            <strong id="summary-meca-inicio" style="color: white;">-</strong>
+                        </div>
+                        <div>
+                            <span id="lbl-summary-meca-duracion" style="color: var(--text-muted); font-size: 11px; display: block; margin-bottom: 2px;">DURACIÓN ESTIMADA</span>
+                            <strong id="summary-meca-duracion" style="color: white;">-</strong>
+                        </div>
+                        <div>
+                            <span id="lbl-summary-meca-fin" style="color: var(--text-muted); font-size: 11px; display: block; margin-bottom: 2px;">PLAZO MÁXIMO DE FINALIZACIÓN</span>
+                            <strong id="summary-meca-plazo-fin" style="color: white;">-</strong>
+                        </div>
+                        <div id="summary-meca-propuesta-box" style="grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 10px; margin-top: 10px;">
+                            <div style="grid-column: span 2;">
+                                <span style="color: var(--primary); font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">2. PROPUESTA TÉCNICA</span>
+                            </div>
+                            <div style="grid-column: span 2;">
+                                <span style="color: var(--text-muted); font-size: 11px; display: block; margin-bottom: 2px;">PROPUESTA DETALLADA</span>
+                                <strong id="summary-meca-propuesta" style="color: white; white-space: pre-wrap;">-</strong>
+                            </div>
+                            <div>
+                                <span style="color: var(--text-muted); font-size: 11px; display: block; margin-bottom: 2px;">CANT DE PERSONAL</span>
+                                <strong id="summary-meca-personal" style="color: white;">-</strong>
+                            </div>
+                            <div>
+                                <span style="color: var(--text-muted); font-size: 11px; display: block; margin-bottom: 2px;">EXCLUSIONES</span>
+                                <strong id="summary-meca-exclusiones" style="color: white;">-</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Caja Destacada de Total -->
+                    <div style="background: rgba(6, 182, 212, 0.08); border: 1px solid var(--glass-border); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: var(--glass-shadow);">
+                        <span style="color: var(--text-muted); font-size: 12px; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 5px;">IMPORTE TOTAL (SUMATORIA)</span>
+                        <div id="summary-total" style="font-size: 32px; font-weight: 800; color: var(--primary); font-family: monospace;">$0,00</div>
+                    </div>
+                </div>
+
+
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Observaciones / Motivo del Presupuesto <span style="color: var(--primary);">*</span></label>
+                    <textarea id="req-reason" rows="3" required placeholder="Escriba aquí los comentarios de carga o justificación del presupuesto comercial..." style="padding: 12px; border-radius: 8px; font-size: 13px; resize: none;"></textarea>
+                </div>
+
+                <div style="margin-top: 15px; display: flex; justify-content: space-between; gap: 15px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 15px;">
+                    <button type="button" class="btn btn-outline" onclick="goToRequestStep(2)" style="min-width: 120px; height: 45px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                        <i class="fas fa-arrow-left"></i> Atrás
+                    </button>
+                    <button type="submit" class="btn btn-success" onclick="confirmarPedido()" style="min-width: 250px; height: 45px; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; background-color: var(--success); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
+                        <i class="fas fa-check-circle" style="font-size: 18px;"></i> Confirmar y Cargar Presupuesto
+                    </button>
+                </div>
+            </div>
+    </template>
+
+    <!-- Template: Modal Datos Adicionales (PRESEA style) -->
+    <template id="tpl-modal-datos-adicionales">
+        <div class="modal-content modal-medium" style="max-width: 650px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
+                <h4 style="margin: 0; font-size: 16px; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-folder-plus"></i> Datos adicionales
+                </h4>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="closeModal()">✕</button>
+            </div>
+            
+            <div class="glass-panel" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; display: flex; flex-direction: column; gap: 20px;">
+                <!-- Grilla de 2 Columnas -->
+                <div style="margin-top: 5px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                    <!-- Columna 1: Modalidad de Entrega -->
+                    <div style="background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.03); border-radius: 8px; padding: 15px; display: flex; flex-direction: column; gap: 12px;">
+                        <div style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; text-align: left;">
+                            <i class="fa-solid fa-truck-ramp-box"></i> Modalidad de Entrega
+                        </div>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: white; font-size: 13px; font-weight: normal;">
+                            <input type="radio" name="modal-req-tipo-entrega" value="retira" checked style="width: 16px; height: 16px; accent-color: var(--primary);">
+                            Retira Cliente
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: white; font-size: 13px; font-weight: normal;">
+                            <input type="radio" name="modal-req-tipo-entrega" value="entrega" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                            Entrega Vendedor
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: white; font-size: 13px; font-weight: normal;">
+                            <input type="radio" name="modal-req-tipo-entrega" value="envio" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                            Envio por Transpor
+                        </label>
+                    </div>
+
+                    <!-- Columna 2: Forma de Pago -->
+                    <div style="background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.03); border-radius: 8px; padding: 15px; display: flex; flex-direction: column; gap: 12px;">
+                        <div style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; text-align: left;">
+                            <i class="fa-solid fa-credit-card"></i> Forma de Pago
+                        </div>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: white; font-size: 13px; font-weight: normal;">
+                            <input type="radio" name="modal-req-forma-pago" value="contado" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                            Contado
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: white; font-size: 13px; font-weight: normal;">
+                            <input type="radio" name="modal-req-forma-pago" value="30dias" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                            A 30 días
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: white; font-size: 13px; font-weight: normal;">
+                            <input type="radio" name="modal-req-forma-pago" value="cheque" checked style="width: 16px; height: 16px; accent-color: var(--primary);">
+                            Pago Cheque
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: white; font-size: 13px; font-weight: normal;">
+                            <input type="radio" name="modal-req-forma-pago" value="transferencia" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                            Pago Transferencia
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: white; font-size: 13px; font-weight: normal;">
+                            <input type="radio" name="modal-req-forma-pago" value="tarjeta" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                            Pago Tarjeta
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="confirmarDatosAdicionales()" style="min-width: 120px;">Aceptar</button>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template: Modal Robot Lupa de Clientes (F6) -->
+    <template id="tpl-modal-robot">
+        <div class="modal-content modal-medium">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h4 style="margin: 0; font-size: 18px; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-search"></i> Buscador Avanzado de Clientes (Lupa PRESEA)
+                </h4>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="closeModal()">✕</button>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 20px;">
+                <input type="text" id="robot-search-input" placeholder="🔍 Escriba parte del nombre, localidad o CUIT..." style="width: 100%; height: 42px; font-size: 14px;" autofocus>
+            </div>
+
+            <div class="glass-card" style="padding: 0; overflow: hidden;">
+                <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                    <table class="data-table" id="robot-results-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 100px;">Código</th>
+                                <th>Nombre Comercial / Razón Social</th>
+                                <th style="width: 140px;">CUIT</th>
+                                <th style="width: 160px;">Localidad</th>
+                            </tr>
+                        </thead>
+                        <tbody id="robot-results-list">
+                            <!-- Resultados dinámicos -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; font-size: 12px; color: var(--text-muted);">
+                <span>💡 Haga clic en una fila para seleccionar el cliente inmediatamente.</span>
+                <span id="robot-results-count">Mostrando 0 clientes</span>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template: Modal Robot Lupa de Proveedores (F6) -->
+    <template id="tpl-modal-robot-proveedores">
+        <div class="modal-content modal-small" style="max-width: 480px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h4 style="margin: 0; font-size: 16px; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-building"></i> Selección de Proveedor
+                </h4>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="closeModal()">✕</button>
+            </div>
+            
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Seleccione el proveedor correspondiente para esta propuesta comercial:</p>
+
+            <div style="display: flex; flex-direction: column; gap: 10px;" id="prov-cards-container">
+                <div id="prov-card-sg" onclick="seleccionarProveedor('SG MONTAJES SRL')" style="background: rgba(34, 211, 238, 0.1); border: 1.5px solid #22d3ee; border-radius: 8px; padding: 14px 16px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 20px;">🏢</span>
+                        <div>
+                            <strong style="color: #ffffff; font-size: 14px; display: block;">SG MONTAJES SRL</strong>
+                            <span style="color: var(--text-muted); font-size: 11px;">Proveedor Principal de Montajes</span>
+                        </div>
+                    </div>
+                    <span class="badge" style="background: rgba(34, 211, 238, 0.2); color: #22d3ee; font-weight: bold;">Seleccionar [↵ Enter]</span>
+                </div>
+
+                <div id="prov-card-acosta" onclick="seleccionarProveedor('ACOSTA SERVICIO')" style="background: rgba(168, 85, 247, 0.1); border: 1.5px solid #a855f7; border-radius: 8px; padding: 14px 16px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 20px;">🛠️</span>
+                        <div>
+                            <strong style="color: #ffffff; font-size: 14px; display: block;">ACOSTA SERVICIO</strong>
+                            <span style="color: var(--text-muted); font-size: 11px;">Proveedor de Servicios Técnicos</span>
+                        </div>
+                    </div>
+                    <span class="badge" style="background: rgba(168, 85, 247, 0.2); color: #c084fc; font-weight: bold;">Seleccionar [↵ Enter]</span>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template: Modal Robot Lupa de Depósitos (F6) -->
+    <template id="tpl-modal-robot-depositos">
+        <div class="modal-content modal-medium">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h4 style="margin: 0; font-size: 18px; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-search"></i> Buscador de Depósitos (Lupa PRESEA)
+                </h4>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="closeModal()">✕</button>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 20px;">
+                <input type="text" id="robot-dep-search-input" placeholder="🔍 Escriba parte del nombre o código..." style="width: 100%; height: 42px; font-size: 14px;" autofocus>
+            </div>
+
+            <div class="glass-card" style="padding: 0; overflow: hidden;">
+                <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre del Depósito / Sucursal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="robot-dep-results-list">
+                            <!-- Resultados dinámicos -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; font-size: 12px; color: var(--text-muted);">
+                <span>💡 Haga clic en una fila para seleccionar el depósito.</span>
+                <span id="robot-dep-results-count">Mostrando 0 depósitos</span>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template: Modal Robot Lupa de Condiciones de Venta (F6) -->
+    <template id="tpl-modal-robot-condiciones">
+        <div class="modal-content modal-medium">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h4 style="margin: 0; font-size: 18px; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-search"></i> Buscador de Condiciones de Venta (Lupa PRESEA)
+                </h4>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="closeModal()">✕</button>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 20px;">
+                <input type="text" id="robot-cond-search-input" placeholder="🔍 Escriba parte del nombre, días o código..." style="width: 100%; height: 42px; font-size: 14px;" autofocus>
+            </div>
+
+            <div class="glass-card" style="padding: 0; overflow: hidden;">
+                <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Descripción de Condición</th>
+                                <th>Días</th>
+                            </tr>
+                        </thead>
+                        <tbody id="robot-cond-results-list">
+                            <!-- Resultados dinámicos -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; font-size: 12px; color: var(--text-muted);">
+                <span>💡 Haga clic en una fila para seleccionar la condición de venta.</span>
+                <span id="robot-cond-results-count">Mostrando 0 condiciones</span>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template: Modal Robot Lupa de Transportes (F6) -->
+    <template id="tpl-modal-robot-transportes">
+        <div class="modal-content modal-medium">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h4 style="margin: 0; font-size: 18px; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-search"></i> Buscador de Transportes (Lupa PRESEA)
+                </h4>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="closeModal()">✕</button>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 20px;">
+                <input type="text" id="robot-trans-search-input" placeholder="🔍 Escriba parte del nombre o código..." style="width: 100%; height: 42px; font-size: 14px;" autofocus>
+            </div>
+
+            <div class="glass-card" style="padding: 0; overflow: hidden;">
+                <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre del Transportista</th>
+                            </tr>
+                        </thead>
+                        <tbody id="robot-trans-results-list">
+                            <!-- Resultados dinámicos -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; font-size: 12px; color: var(--text-muted);">
+                <span>💡 Haga clic en una fila para seleccionar el transporte.</span>
+                <span id="robot-trans-results-count">Mostrando 0 transportes</span>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template: Bandeja de Pedidos (Asignaciones / Historial) -->
+    <template id="tpl-assignments">
+        <div class="view-header assignments-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div>
+                <h3 id="assignments-title">Asignaciones y Tareas</h3>
+                <p id="assignments-subtitle" style="font-size: 13px; color: var(--text-muted); margin: 0;"></p>
+            </div>
+            
+            <!-- Selector y Badge de Rubro para cambiar entre Eléctrico y Mecánico -->
+            <div id="assignments-rubro-badge-container" style="display: flex; align-items: center; gap: 8px;">
+                <span id="assignments-tipo-presupuesto-badge" class="badge" style="background: rgba(234, 179, 8, 0.2); color: #fde047; font-size: 12px; padding: 6px 14px; border: 1px solid rgba(234, 179, 8, 0.4); border-radius: 8px; font-weight: 700;">
+                    ⚡ Presupuesto Eléctrico
+                </span>
+                <button type="button" class="btn btn-sm btn-outline" onclick="abrirModalTipoPresupuesto()" style="font-size: 11px; padding: 5px 12px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;" title="Cambiar rubro entre Eléctrico y Mecánico">
+                    <i class="fa-solid fa-arrows-rotate"></i> Cambiar Rubro
+                </button>
+            </div>
+
+            <div class="assignments-filters">
+                <div class="filter-group" id="date-filters" style="display: flex; align-items: center; gap: 5px;">
+                    <label style="font-size: 0.8rem; margin:0;">Desde:</label>
+                    <input type="date" id="filter-date-from" class="search-input date-filter-input" style="height: 34px; width: auto; min-width: 120px; padding: 4px 8px; font-size: 11.5px;" title="Clic derecho para filtros rápidos (Hoy, Ayer, etc.)">
+                    <label style="font-size: 0.8rem; margin:0;">Hasta:</label>
+                    <input type="date" id="filter-date-to" class="search-input date-filter-input" style="height: 34px; width: auto; min-width: 120px; padding: 4px 8px; font-size: 11.5px;" title="Clic derecho para filtros rápidos (Hoy, Ayer, etc.)">
+                </div>
+                <select id="status-filter" class="search-input" style="height: 34px; width: 165px; padding: 4px 10px; font-size: 12px; background: rgba(30, 41, 59, 0.7); color: white; border: 1px solid var(--glass-border); border-radius: 8px; cursor: pointer;" onchange="renderAssignmentsTable()">
+                    <option value="">📋 Todos los estados</option>
+                    <option value="Enviado sin OC">📤 Enviado sin OC</option>
+                    <option value="Aprobado sin OC">⏳ Aprobado sin OC</option>
+                    <option value="Aprobado con OC">✅ Aprobado con OC</option>
+                    <option value="Facturado Parcial">🧾 Facturado Parcial</option>
+                    <option value="Facturado Total">💎 Facturado Total</option>
+                    <option value="Rechazado">❌ Rechazado</option>
+                </select>
+                <input type="text" id="search-filter" class="search-input" placeholder="🔍 Buscar por cliente o CUIT..." style="height: 34px; width: 190px; min-width: 130px; padding: 4px 10px; font-size: 12px;">
+            </div>
+        </div>
+
+        <div class="glass-card" style="padding: 12px;">
+            <!-- Barra de Vistas Personalizadas -->
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.07); padding-bottom: 8px; flex-wrap: wrap;">
+                <div id="table-views-tabs" style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                    <!-- Botones de vistas cargados dinámicamente -->
+                </div>
+                <button type="button" class="btn btn-sm" onclick="abrirModalAgregarVista()" style="background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px dashed #0284c7; font-weight: 700; font-size: 11px; padding: 3px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px;" title="Crear y guardar una nueva vista con tu agrupación y filtros preferidos">
+                    <i class="fas fa-plus"></i> Agregar Vista
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="data-table" id="assignments-data-table">
+                    <thead id="assignments-table-thead">
+                        <tr id="assignments-header-row">
+                            <!-- Columnas dinámicas y reordenables por arrastre -->
+                        </tr>
+                    </thead>
+                    <tbody id="assignments-list">
+                        <!-- Filas dinámicas -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template: Modal de Autorización PRESEA (Aprobación / Rechazo) -->
+    <template id="tpl-modal-auth">
+        <div class="modal-content modal-large">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <button type="button" class="btn btn-sm" onclick="volverAccionAnterior()" style="font-family: inherit; font-size: 12px; font-weight: 700; height: 34px; padding: 0 12px; background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1.5px solid #38bdf8; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; cursor: pointer;" title="Volver a la bandeja">
+                        <i class="fa-solid fa-arrow-left"></i> Volver
+                    </button>
+                    <h4 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 8px; white-space: nowrap;">
+                        📄 Comprobante de Presupuesto
+                    </h4>
+                </div>
+                <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                    <button id="btn-modal-avance-obra" type="button" class="btn btn-sm" onclick="abrirModalAvanceObra(pedidoActivo.id)" style="font-family: inherit; font-size: 12px; font-weight: 700; height: 34px; padding: 0 12px; background: #0d9488; color: #ffffff; border: 1px solid #0d9488; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;" title="Registrar Avance de Obra (%) y notificar facturación">
+                        <i class="fas fa-hammer"></i> Avance de Obra
+                    </button>
+                    <button id="btn-modal-basar-presupuesto" type="button" class="btn btn-sm" onclick="crearPresupuestoBasadoEnActual()" style="font-family: inherit; font-size: 12px; font-weight: 700; height: 34px; padding: 0 12px; background: #7c3aed; color: #ffffff; border: 1px solid #7c3aed; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;" title="Crear un nuevo presupuesto precompletando los datos de este">
+                        <i class="fas fa-copy"></i> Crear presupuesto basado en este
+                    </button>
+                    <div id="auth-report-type-toggle-container" style="display: inline-flex; height: 34px; background: rgba(15, 23, 42, 0.7); padding: 2px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); align-items: center; box-sizing: border-box;">
+                        <button type="button" id="btn-toggle-report-detallado" onclick="cambiarTipoReporteEnVista('detallado')" style="font-family: inherit; font-size: 12px; font-weight: 700; height: 28px; padding: 0 10px; border-radius: 4px; border: none; cursor: pointer; background: #0284c7; color: #ffffff; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">
+                            <i class="fas fa-file-lines"></i> Detallado
+                        </button>
+                        <button type="button" id="btn-toggle-report-resumido" onclick="cambiarTipoReporteEnVista('resumido')" style="font-family: inherit; font-size: 12px; font-weight: 700; height: 28px; padding: 0 10px; border-radius: 4px; border: none; cursor: pointer; background: transparent; color: var(--text-muted); display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">
+                            <i class="fas fa-clipboard-list"></i> Resumido
+                        </button>
+                    </div>
+                    <button type="button" class="btn btn-sm" onclick="compartirWhatsAppPedido(pedidoActivo.id)" style="font-family: inherit; font-size: 12px; font-weight: 700; height: 34px; padding: 0 12px; background: #16a34a; color: #ffffff; border: 1px solid #16a34a; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
+                        <i class="fab fa-whatsapp"></i> WhatsApp
+                    </button>
+                    <button type="button" class="btn btn-sm" onclick="enviarEmailPedido(pedidoActivo.id)" style="font-family: inherit; font-size: 12px; font-weight: 700; height: 34px; padding: 0 12px; background: #0284c7; color: #ffffff; border: 1px solid #0284c7; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
+                        <i class="fas fa-envelope"></i> Enviar por Email
+                    </button>
+                    <button type="button" class="btn btn-sm" onclick="window.print()" style="font-family: inherit; font-size: 12px; font-weight: 700; height: 34px; padding: 0 12px; background: rgba(255,255,255,0.1); color: #ffffff; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
+                        <i class="fas fa-print"></i> Imprimir / PDF
+                    </button>
+                    <button type="button" class="btn btn-sm" onclick="closeModal()" style="font-family: inherit; font-size: 14px; font-weight: 700; height: 34px; width: 34px; padding: 0; background: rgba(255,255,255,0.1); color: #ffffff; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; display: inline-flex; align-items: center; justify-content: center;">
+                        ✕
+                    </button>
+                </div>
+            </div>
+
+            <!-- Selector de Cambio Directo de Estado del Presupuesto (Solo visible en Modo Modificación) -->
+            <div style="margin-bottom: 12px; padding: 10px 16px; background: rgba(30, 41, 59, 0.7); border: 1px solid var(--glass-border); border-radius: 10px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;">
+                <div id="modal-status-edit-group" style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-weight: 700; color: var(--primary); font-size: 13px;">✏️ Modificar Estado:</span>
+                    <select id="modal-change-status-select" style="background: rgba(15, 23, 42, 0.85); color: white; border: 1px solid var(--glass-border); padding: 5px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;" onchange="ejecutarCambioEstadoPresupuesto(this.value)">
+                        <option value="Enviado sin OC">📤 Enviado sin OC</option>
+                        <option value="Aprobado sin OC">⏳ Aprobado sin OC</option>
+                        <option value="Aprobado con OC">✅ Aprobado con OC</option>
+                        <option value="Facturado Parcial">🧾 Facturado Parcial</option>
+                        <option value="Facturado Total">💎 Facturado Total</option>
+                        <option value="Rechazado">❌ Rechazado</option>
+                    </select>
+                </div>
+                <div id="modal-status-badge-container"></div>
+            </div>
+
+
+
+            <!-- Hoja blanca simulando el Presupuesto Oficial de SG MONTAJES -->
+            <div class="mobile-only" style="font-size: 11px; color: var(--primary); text-align: center; margin: 5px 0 10px 0; background: rgba(6, 182, 212, 0.1); padding: 8px; border-radius: 6px; border: 1px dashed var(--glass-border);">
+                <i class="fa-solid fa-left-right"></i> Deslice la planilla hacia los lados para verla completa
+            </div>
+            
+            <div class="palaversich-sheet">
+                <!-- Cabecera Oficial -->
+                <div class="invoice-header">
+                    <!-- Caja Izquierda: Logo y Empresa -->
+                    <div class="header-box header-left">
+                        <div class="logo-container">
+                            <img src="logo_sg_montajes.png" alt="SG MONTAJES Logo" style="height: 38px; width: auto; object-fit: contain;">
+                            <div class="logo-text">
+                                <span class="brand-name" style="font-size: 17px; font-weight: bold; color: #ffffff;">SG MONTAJES</span>
+                            </div>
+                        </div>
+                        <div class="company-details" style="font-size: 10px; line-height: 1.3; color: var(--text-muted);">
+                            <strong style="color: #ffffff;">I.V.A. Responsable Inscripto</strong><br>
+                            Av. Pellegrini 1234 (CP 2000)<br>
+                            Rosario - Pcia. Santa Fe
+                        </div>
+                    </div>
+                    
+                    <!-- Caja Central: Letra de Comprobante X -->
+                    <div class="header-box header-middle">
+                        <div class="invoice-letter">X</div>
+                        <div class="invoice-warning">Comprobante no<br>válido como factura</div>
+                    </div>
+                    
+                    <!-- Caja Derecha: Título e Identificación -->
+                    <div class="header-box header-right">
+                        <div class="invoice-title">PRESUPUESTO</div>
+                        <div class="invoice-number">Nro. <span id="auth-id">00000-00014873</span></div>
+                        <div class="invoice-date">Fecha: <span id="auth-date-val">17/09/2023</span></div>
+                        <div id="auth-header-oc-container" style="font-size: 10px; font-weight: 800; margin-top: 3px; background: rgba(2, 132, 199, 0.15); padding: 2px 6px; border-radius: 4px; border: 1px dashed #0284c7; color: #38bdf8;">
+                            Orden de Compra: <span id="auth-header-nro-oc-val" style="color: #38bdf8; font-weight: 800;">-</span>
+                        </div>
+                        <div style="font-size: 9.5px; margin-top: 4px; color: var(--text-muted); line-height: 1.3;">
+                            C.U.I.T.: <span style="color: #ffffff;">30-00000000-0</span><br>
+                            I.I.B.B.: <span style="color: #ffffff;">000-000000-0</span><br>
+                            Fecha Inicio Actividades: <span style="color: #ffffff;">01/01/2020</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ficha Identificación de la Oferta / Propuesta Técnica -->
+                <div id="auth-mecanico-header-box" style="display: none; margin-bottom: 12px; background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; overflow: hidden; font-size: 12px; color: var(--text-main); text-align: left; box-shadow: var(--glass-shadow);">
+                    <div style="background: rgba(6, 182, 212, 0.15); color: #22d3ee; font-weight: 800; font-size: 13px; padding: 10px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; gap: 8px;">
+                        <span style="background: #0891b2; color: white; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 800;">1</span>
+                        <span style="letter-spacing: 0.5px; font-weight: 800; text-decoration: underline;">IDENTIFICACIÓN DE LA OFERTA</span>
+                    </div>
+                    
+                    <div style="padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+                        <div style="display: grid; grid-template-columns: 240px 1fr; gap: 8px; align-items: center;">
+                            <span style="font-style: italic; font-weight: 700; color: rgba(255,255,255,0.75);">i. Denominación del Servicio:</span>
+                            <span id="auth-meca-denominacion-val" style="font-weight: 700; color: #ffffff;">-</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 240px 1fr; gap: 8px; align-items: center;">
+                            <span style="font-style: italic; font-weight: 700; color: rgba(255,255,255,0.75);">ii. Cliente:</span>
+                            <span id="auth-meca-cliente-val" style="font-weight: 700; color: #ffffff;">CARGILL SACI</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 240px 1fr; gap: 8px; align-items: center;">
+                            <span style="font-style: italic; font-weight: 700; color: rgba(255,255,255,0.75);">iii. Nombre del Proveedor:</span>
+                            <span id="auth-meca-proveedor-val" style="font-weight: 700; color: #ffffff;">SG MONTAJES SRL</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 240px 1fr; gap: 8px; align-items: center; background: rgba(234, 179, 8, 0.12); padding: 4px 8px; border-radius: 6px;">
+                            <span style="font-style: italic; font-weight: 700; color: #fde047;">iv. Fecha de Oferta:</span>
+                            <span id="auth-meca-oferta-val" style="font-weight: 800; color: #fde047;">-</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 240px 1fr; gap: 8px; align-items: center;">
+                            <span style="font-style: italic; font-weight: 700; color: rgba(255,255,255,0.75);">v. Validez de la Oferta:</span>
+                            <span id="auth-meca-validez-val" style="font-weight: 700; color: #ffffff;">5 días</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 240px 1fr; gap: 8px; align-items: center;">
+                            <span style="font-style: italic; font-weight: 700; color: rgba(255,255,255,0.75);">vi. Planta:</span>
+                            <span id="auth-meca-planta-val" style="font-weight: 700; color: #ffffff;">APS</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 240px 1fr; gap: 8px; align-items: center;">
+                            <span id="lbl-auth-meca-inicio" style="font-style: italic; font-weight: 700; color: rgba(255,255,255,0.75);">vii. Fecha estimada de Inicio:</span>
+                            <span id="auth-meca-inicio-val" style="font-weight: 700; color: #ffffff;">-</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 240px 1fr; gap: 8px; align-items: center;">
+                            <span id="lbl-auth-meca-duracion" style="font-style: italic; font-weight: 700; color: rgba(255,255,255,0.75);">viii. Duración estimada de la Ejecución:</span>
+                            <span id="auth-meca-duracion-val" style="font-weight: 700; color: #ffffff;">-</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 240px 1fr; gap: 8px; align-items: center; background: rgba(234, 179, 8, 0.12); padding: 4px 8px; border-radius: 6px;">
+                            <span id="lbl-auth-meca-fin" style="font-style: italic; font-weight: 700; color: #fde047;">ix. Plazo Máximo de Finalización:</span>
+                            <span id="auth-meca-fin-val" style="font-weight: 800; color: #fde047;">-</span>
+                        </div>
+
+                        <!-- 2. PROPUESTA TÉCNICA -->
+                        <div id="auth-meca-propuesta-box" style="border-top: 1px solid rgba(255, 255, 255, 0.08); margin-top: 6px; padding-top: 8px; display: flex; flex-direction: column; gap: 6px;">
+                            <div style="font-weight: 800; color: #22d3ee; margin-bottom: 2px;">2. PROPUESTA TÉCNICA (DESCRIPCIÓN)</div>
+                            <div><strong style="color: rgba(255,255,255,0.75);">DETALLAR PROPUESTA:</strong> <span id="auth-meca-propuesta-val" style="color: #ffffff;">-</span></div>
+                            <div><strong style="color: rgba(255,255,255,0.75);">CANT DE PERSONAL DESTINADO:</strong> <span id="auth-meca-personal-val" style="color: #ffffff;">-</span></div>
+                            <div><strong style="color: rgba(255,255,255,0.75);">INDICAR EXCLUSIONES:</strong> <span id="auth-meca-exclusiones-val" style="color: #ffffff;">-</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contenedor del Tarifario / Propuesta Comercial con Pestañas (Paso 2: Ubicado después del Paso 1) -->
+                <div id="auth-mecanico-excel-container" style="display: none; margin-bottom: 12px;"></div>
+
+                <!-- Ficha del Cliente (Customer Info Box) -->
+                <div class="customer-info-box" id="auth-customer-info-box">
+                    <div class="info-row">
+                        <div class="info-cell cell-100"><strong>Cliente:</strong> <span id="auth-client-display">-</span></div>
+                    </div>
+                    <div class="info-row border-top">
+                        <div class="info-cell cell-60"><strong>Domicilio:</strong> <span id="auth-domicilio-val">-</span></div>
+                        <div class="info-cell cell-40 border-left"><strong>Localidad:</strong> <span id="auth-localidad-val">-</span></div>
+                    </div>
+                    <div class="info-row border-top">
+                        <div class="info-cell cell-60"><strong>Cond. I.V.A.:</strong> <span id="auth-iva-val">CONSUMIDOR FINAL</span></div>
+                        <div class="info-cell cell-40 border-left"><strong>C.U.I.T.:</strong> <span id="auth-cuit-val">-</span></div>
+                    </div>
+                    <div class="info-row border-top">
+                        <div class="info-cell cell-33"><strong>Condición de venta:</strong> <span id="auth-condition-container">-</span></div>
+                        <div class="info-cell cell-33 border-left"><strong>Depósito:</strong> <span id="auth-deposit-container">-</span></div>
+                        <div class="info-cell cell-34 border-left"><strong>Transporte:</strong> <span id="auth-transport-container">-</span></div>
+                    </div>
+                    <div class="info-row border-top bg-light">
+                        <div class="info-cell cell-33"><strong>Moneda:</strong> <span id="auth-currency-container">-</span></div>
+                        <div class="info-cell cell-33 border-left"><strong>Cargado Por:</strong> <span id="auth-user-val">-</span></div>
+                        <div class="info-cell cell-34 border-left"><strong>Control SLA:</strong> <span id="auth-sla-val">-</span></div>
+                    </div>
+                    <div class="info-row border-top">
+                        <div class="info-cell cell-50"><strong>Entrega:</strong> <span id="auth-entrega-val">-</span></div>
+                        <div class="info-cell cell-50 border-left"><strong>Forma Pago:</strong> <span id="auth-pago-val">-</span></div>
+                    </div>
+                </div>
+
+                <!-- Desglose de Artículos (Grilla Oficial) -->
+                <div id="auth-items-panel" style="display: none; margin-bottom: 15px;">
+                    <table class="pdf-table">
+                        <thead>
+                            <tr class="pdf-th">
+                                <th style="text-align: center; width: 35px;" class="auth-edit-col">✔</th>
+                                <th class="col-code">CÓDIGO</th>
+                                <th style="text-align: left;">DETALLE</th>
+                                <th class="col-qty">CANTIDAD</th>
+                                <th class="col-price">PRECIO</th>
+                                <th class="col-total">PRECIO TOTAL</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auth-items-list-body">
+                            <!-- Ítems dinámicos -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Bloque Inferior: Observaciones, Facturas Pendientes y Totales -->
+                <div class="invoice-bottom-layout">
+                    <!-- Izquierda: Observaciones y Detalle de Facturas Pendientes -->
+                    <div class="bottom-left-panel">
+                        <div class="observations-box-v2">
+                            <strong>OBSERVACIONES:</strong> <span id="auth-reason-val">-</span>
+                        </div>
+                        <div class="pending-bills-box">
+                            <div class="box-title">Detalle de facturas pendientes</div>
+                            <div class="bills-list" id="auth-bills-list">
+                                <!-- Cargado dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Derecha: Totales Oficiales -->
+                    <div class="bottom-right-panel">
+                        <table class="totals-table">
+                            <tr>
+                                <td class="totals-label">SUBTOTAL</td>
+                                <td class="totals-value" id="auth-subtotal-val">$0,00</td>
+                            </tr>
+                            <tr>
+                                <td class="totals-label">NETO GRAVADO</td>
+                                <td class="totals-value" id="auth-neto-val">$0,00</td>
+                            </tr>
+                            <tr>
+                                <td class="totals-label">I.V.A. (21%)</td>
+                                <td class="totals-value" id="auth-iva-val-calc" style="color: #fde047 !important;">$0,00</td>
+                            </tr>
+                            <tr class="total-row">
+                                <td class="totals-label font-bold" id="auth-total-label">TOTAL (IVA Incluido)</td>
+                                <td class="totals-value font-bold" id="auth-total-val-calc">$0,00</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Banner Informativo de Precios -->
+                <div style="border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; padding: 8px; text-align: center; font-weight: 800; font-size: 11px; margin-top: 10px; margin-bottom: 8px; color: var(--text-muted); background: rgba(30, 41, 59, 0.4); letter-spacing: 0.5px;">
+                    PRECIOS DEL PRESUPUESTO, SUJETOS A MODIFICACIONES SIN PREVIO AVISO
+                </div>
+
+                <!-- Aclaraciones & Condiciones Oficiales de Presupuesto Mecánico -->
+                <div id="auth-mecanico-aclaraciones" style="display: none; margin-top: 10px; margin-bottom: 10px; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 10px; font-size: 11px; color: var(--text-main); text-align: left; background: rgba(30, 41, 59, 0.4);">
+                    <div style="color: #f43f5e; font-weight: bold; font-size: 12px; margin-bottom: 6px;">
+                        ⚠️ Aclaraciones: LAS HORAS DE EMERGENCIA SE CONTEMPLAN 5 HORAS NORMALES.
+                    </div>
+                    <div style="line-height: 1.6; color: var(--text-main);">
+                        <div><strong style="color: rgba(255,255,255,0.75);">i. Garantía Requerida:</strong> 6 MESES</div>
+                        <div><strong style="color: rgba(255,255,255,0.75);">ii. Convenio:</strong> La Mano de Obra contempla el Convenio UOCRA vigente. Los trabajos en planta contemplan el convenio Agroexportador.</div>
+                        <div><strong style="color: rgba(255,255,255,0.75);">iii. Forma de Pago:</strong> 30 días fecha de factura</div>
+                    </div>
+                </div>
+
+                <!-- Footer de Equivalencia y Entrega -->
+                <div class="invoice-footer-info">
+                    <div class="footer-info-left">
+                        <div class="system-footer-line" style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">
+                            Presea &nbsp;&nbsp; Usuario:<span id="auth-sys-user" style="color: #fff;">1</span> &nbsp;&nbsp; Fecha:<span id="auth-sys-date" style="color: #fff;">-</span> &nbsp;&nbsp; Item: <span id="auth-sys-items-count" style="color: #fff;">0</span> &nbsp;&nbsp; Reporte: PRESUPUE_GR &nbsp;&nbsp; Página: 1
+                        </div>
+                    </div>
+                    <div class="footer-info-right">
+                        <div class="cai-details">
+                            Nro C.A.I.: <span id="auth-cai-val">0</span> &nbsp;&nbsp; Vto: <span id="auth-cai-vto">/ /</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nota: Se eliminó el panel de estado crediticio y bloqueo a petición del usuario. -->
+                
+                <!-- Historial de Auditoría si ya fue resuelta -->
+                <div id="auth-resolved-panel" style="display: none; margin-bottom: 15px; font-size: 12px; border: 1px solid #2b6cb0; padding: 10px; background: #ebf8ff; color: #2b6cb0;">
+                    <strong style="display: block; margin-bottom: 5px;">📜 Resolución de Tarea (Administración):</strong>
+                    <div>Estado final: <strong id="auth-final-state" style="text-transform: uppercase;">Aprobado</strong></div>
+                    <div>Fecha de resolución: <span id="auth-resolution-date">-</span></div>
+                    <div id="auth-reject-comment-container" style="display: none; margin-top: 5px;">Motivo rechazo: <em id="auth-reject-comment">-</em></div>
+                </div>
+            </div>
+
+            <!-- Acciones de Resolución (Solo visibles si está Pendiente) -->
+            <div id="auth-actions-panel" style="margin-top: 20px; display: flex; flex-direction: column; gap: 15px;">
+                <!-- Opciones de decisión (Tildes/Radio) -->
+                <div style="display: flex; gap: 20px; align-items: center; justify-content: center; margin-bottom: 5px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: white; font-size: 15px; font-weight: 600;">
+                        <input type="radio" name="auth-decision" value="autorizar" checked onclick="toggleAuthDecision('autorizar')" style="width: 18px; height: 18px; accent-color: var(--success);">
+                        ✅ Aceptado / Autorizado
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: white; font-size: 15px; font-weight: 600;">
+                        <input type="radio" name="auth-decision" value="rechazar" onclick="toggleAuthDecision('rechazar')" style="width: 18px; height: 18px; accent-color: var(--danger);">
+                        ❌ Rechazado
+                    </label>
+                </div>
+
+
+
+                <div class="form-group" id="reject-comment-group" style="display: none; animation: fadeIn 0.2s; margin-top: 5px;">
+                    <label style="color: var(--danger); font-weight: bold;">Motivo del Rechazo <span style="color: #ff8888;">(Obligatorio)</span></label>
+                    <textarea id="auth-reject-reason-input" rows="2" placeholder="Ingrese el motivo obligatorio por el cual rechaza el presupuesto..." style="width: 100%; border-color: var(--danger);"></textarea>
+                </div>
+                
+                <div style="display: flex; justify-content: center; margin-top: 5px;">
+                    <button id="btn-confirm-auth" class="btn btn-success" style="font-size: 15px; padding: 10px 40px; font-weight: bold; width: 100%; background: var(--success);" onclick="confirmarResolucion()">
+                        Aceptar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template: Análisis de Presupuestos (Métricas y Rendimiento) -->
+    <template id="tpl-metrics">
+        <div class="view-header">
+            <h3>📊 Análisis de Presupuestos</h3>
+            <p>Monitoreo en tiempo real del volumen comercial facturado y retenido.</p>
+        </div>
+        
+        <!-- Filtros de Métricas -->
+        <div class="glass-card" style="margin-bottom: 20px; display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+            <div class="form-group" style="margin-bottom: 0; min-width: 150px;">
+                <label>Fecha Inicio</label>
+                <input type="date" id="filter-date-start" style="height: 42px; box-sizing: border-box;" title="Clic derecho para filtros rápidos (Hoy, Ayer, etc.)">
+            </div>
+            <div class="form-group" style="margin-bottom: 0; min-width: 150px;">
+                <label>Fecha Fin</label>
+                <input type="date" id="filter-date-end" style="height: 42px; box-sizing: border-box;" title="Clic derecho para filtros rápidos (Hoy, Ayer, etc.)">
+            </div>
+            <div class="form-group" style="margin-bottom: 0; min-width: 200px;">
+                <label>Vendedor</label>
+                <select id="filter-metrics-seller" style="height: 42px; box-sizing: border-box; background: rgba(30, 41, 59, 0.6); color: white; border: 1px solid var(--glass-border); border-radius: 6px; padding: 0 10px; width: 100%;">
+                    <option value="">Todos los Vendedores...</option>
+                </select>
+            </div>
+            <button id="btn-apply-filters" class="btn btn-primary" style="height: 42px;">Filtrar</button>
+            <button id="btn-clear-filters" class="btn btn-outline" style="height: 42px;">Limpiar</button>
+        </div>
+
+        <!-- Tarjetas de Métricas -->
+        <div class="metrics-grid" style="margin-bottom: 24px;">
+            <div class="glass-card metric-card" onclick="abrirModalMetricaVendedor('total')" title="Haga clic para ver desglose por vendedor">
+                <h5>Pedidos Ingresados</h5>
+                <div class="metric-value" id="metric-total">0</div>
+                <div style="font-size: 14px; color: var(--text-muted); margin-top: 5px;">Monto Total: <strong id="metric-total-amt">$0.00</strong></div>
+            </div>
+            <div class="glass-card metric-card" onclick="abrirModalMetricaVendedor('approved')" title="Haga clic para ver desglose por vendedor">
+                <h5>Pedidos Autorizados / Aprobados</h5>
+                <div class="metric-value text-success" id="metric-approved" style="color: var(--success);">0</div>
+                <div style="font-size: 14px; color: var(--text-muted); margin-top: 5px;">Monto: <strong id="metric-approved-amt">$0.00</strong></div>
+            </div>
+            <div class="glass-card metric-card" onclick="abrirModalMetricaVendedor('pending')" title="Haga clic para ver desglose por vendedor">
+                <h5>Pendientes de Autorización</h5>
+                <div class="metric-value text-warning" id="metric-pending" style="color: var(--primary);">0</div>
+                <div style="font-size: 14px; color: var(--text-muted); margin-top: 5px;">Monto: <strong id="metric-pending-amt">$0.00</strong></div>
+            </div>
+            <div class="glass-card metric-card" onclick="abrirModalMetricaVendedor('rejected')" title="Haga clic para ver desglose por vendedor">
+                <h5>Pedidos Rechazados</h5>
+                <div class="metric-value text-danger" id="metric-rejected" style="color: var(--danger);">0</div>
+                <div style="font-size: 14px; color: var(--text-muted); margin-top: 5px;">Monto: <strong id="metric-rejected-amt">$0.00</strong></div>
+            </div>
+        </div>
+
+        <!-- Gráficos -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+            <div class="glass-card">
+                <h5 style="text-align: center; margin-bottom: 15px;">Distribución de Pedidos (Cantidades)</h5>
+                <div style="position: relative; height: 300px; width: 100%;">
+                    <canvas id="chartStatusPie"></canvas>
+                </div>
+            </div>
+            <div class="glass-card">
+                <h5 style="text-align: center; margin-bottom: 15px;">Monto Comercial por Estado ($)</h5>
+                <div style="position: relative; height: 300px; width: 100%;">
+                    <canvas id="chartAmountBar"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rendimiento por Vendedor -->
+        <div class="glass-card" style="margin-bottom: 24px;">
+            <h5 style="text-align: left; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; color: var(--primary);">
+                <i class="fa-solid fa-user-tie"></i> Rendimiento por Vendedor
+            </h5>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Vendedor</th>
+                            <th style="text-align: right;">Pedidos Aprobados</th>
+                            <th style="text-align: right;">Monto Aprobado ($)</th>
+                            <th style="text-align: right;">Pedidos Totales</th>
+                            <th style="text-align: right;">Monto Total ($)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="seller-performance-list">
+                        <!-- Filas dinámicas por vendedor -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template: Consulta de Stock / Inventario -->
+    <template id="tpl-stock-query">
+        <div class="view-header" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px;">
+            <div>
+                <h3>📦 Consulta de Stock (Inventario PRESEA)</h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin: 0;">Consulte los niveles de existencia física y precios de la base de datos comercial.</p>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+                <select id="filter-stock-rubro" class="search-input" style="height: 38px; width: 200px; padding: 4px 10px; font-size: 12px; background: rgba(30, 41, 59, 0.6); color: white; border: 1px solid var(--glass-border);">
+                    <option value="">Todos los Rubros...</option>
+                </select>
+                <select id="filter-stock-estado" class="search-input" style="height: 38px; width: 160px; padding: 4px 10px; font-size: 12px; background: rgba(30, 41, 59, 0.6); color: white; border: 1px solid var(--glass-border);">
+                    <option value="">Todos los Estados...</option>
+                </select>
+                <input type="text" id="search-stock" class="search-input" placeholder="🔍 Buscar por detalle o código..." style="height: 38px; width: 220px; padding: 4px 10px; font-size: 12px;">
+            </div>
+        </div>
+
+        <!-- KPIs Rápidos de Stock -->
+        <div class="metrics-grid" style="margin-bottom: 20px; grid-template-columns: repeat(3, 1fr);">
+            <div class="glass-card metric-card" style="padding: 15px;">
+                <h5 style="margin-bottom: 5px;">Total Artículos</h5>
+                <div class="metric-value" id="stock-kpi-total" style="font-size: 28px;">0</div>
+            </div>
+            <div class="glass-card metric-card" style="padding: 15px;">
+                <h5 style="margin-bottom: 5px;">Con Stock Disponible</h5>
+                <div class="metric-value text-success" id="stock-kpi-available" style="font-size: 28px; color: var(--success);">0</div>
+            </div>
+            <div class="glass-card metric-card" style="padding: 15px;">
+                <h5 style="margin-bottom: 5px;">Sin Existencias (Agotado)</h5>
+                <div class="metric-value text-danger" id="stock-kpi-empty" style="font-size: 28px; color: var(--danger);">0</div>
+            </div>
+        </div>
+
+        <div class="glass-card table-responsive" style="max-height: 500px; overflow-y: auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Detalle / Artículo</th>
+                        <th>Rubro</th>
+                        <th>Subrubro</th>
+                        <th style="text-align: right;">Precio Unitario</th>
+                        <th style="text-align: right;">Stock Físico</th>
+                        <th style="text-align: center;">Disponibilidad</th>
+                    </tr>
+                </thead>
+                <tbody id="stock-query-list">
+                    <!-- Artículos dinámicos -->
+                </tbody>
+            </table>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; font-size: 12px; color: var(--text-muted);">
+            <span>💡 Escriba en el buscador para filtrar en tiempo real.</span>
+            <span id="stock-results-count">Mostrando 0 productos</span>
+        </div>
+    </template>
+
+    <!-- Template: Modal Detalle por Vendedor de Métrica (Card Click) -->
+    <template id="tpl-modal-vendedor-metrics">
+        <div class="modal-content modal-medium" style="max-width: 700px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h4 style="margin: 0; font-size: 18px; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-user-tie"></i> <span id="modal-metric-title">Detalle de Vendedores</span>
+                </h4>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="closeModal()">✕</button>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 20px;">
+                <input type="text" id="modal-metric-search-input" placeholder="🔍 Escriba para buscar vendedor..." style="width: 100%; height: 42px; font-size: 14px;" autofocus>
+            </div>
+
+            <div class="glass-card" style="padding: 0; overflow: hidden;">
+                <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Vendedor</th>
+                                <th style="text-align: right;">Cantidad de Pedidos</th>
+                                <th style="text-align: right;">Monto Total ($)</th>
+                                <th style="text-align: right;">% del Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modal-metric-results-list">
+                            <!-- Resultados dinámicos por vendedor -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; font-size: 12px; color: var(--text-muted);">
+                <span>💡 El listado muestra el desglose del indicador seleccionado dentro del rango de fechas.</span>
+                <span id="modal-metric-results-count">Mostrando 0 vendedores</span>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template: Modal Robot Lupa de Ítems y Horas del Tarifario (F6) -->
+    <template id="tpl-modal-robot-stock">
+        <div class="modal-content modal-medium" style="max-width: 850px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h4 style="margin: 0; font-size: 18px; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-search"></i> Buscador del Tarifario (Propuesta Comercial)
+                </h4>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="closeModal()">✕</button>
+            </div>
+
+            <!-- Pestañas Rápidas del Tarifario -->
+            <div id="robot-stock-tabs-container" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; background: rgba(15, 23, 42, 0.4); padding: 8px; border-radius: 8px; border: 1px solid var(--glass-border);">
+                <button type="button" class="robot-tab-btn active" data-tab="" onclick="filterRobotByTab(this, '')" style="padding: 6px 12px; font-size: 11px; font-weight: 700; border-radius: 6px; border: 1px solid var(--primary); background: var(--primary); color: white; cursor: pointer;">
+                    📋 Todos los Ítems
+                </button>
+                <button type="button" class="robot-tab-btn" data-tab="TALLER" onclick="filterRobotByTab(this, 'TALLER')" style="padding: 6px 12px; font-size: 11px; font-weight: 700; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: var(--text-muted); cursor: pointer;">
+                    1. MO Taller
+                </button>
+                <button type="button" class="robot-tab-btn" data-tab="MANTENIMIENTO" onclick="filterRobotByTab(this, 'MANTENIMIENTO')" style="padding: 6px 12px; font-size: 11px; font-weight: 700; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: var(--text-muted); cursor: pointer;">
+                    2. MO Mantenimiento
+                </button>
+                <button type="button" class="robot-tab-btn" data-tab="PARADA" onclick="filterRobotByTab(this, 'PARADA')" style="padding: 6px 12px; font-size: 11px; font-weight: 700; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: var(--text-muted); cursor: pointer;">
+                    3. MO Parada Planta
+                </button>
+                <button type="button" class="robot-tab-btn" data-tab="EMERGENCIA" onclick="filterRobotByTab(this, 'EMERGENCIA')" style="padding: 6px 12px; font-size: 11px; font-weight: 700; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: var(--text-muted); cursor: pointer;">
+                    4. MO Emergencia
+                </button>
+                <button type="button" class="robot-tab-btn" data-tab="Materiales" onclick="filterRobotByTab(this, 'Materiales')" style="padding: 6px 12px; font-size: 11px; font-weight: 700; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: var(--text-muted); cursor: pointer;">
+                    5. Materiales y Equipos
+                </button>
+            </div>
+            
+            <div class="form-row" style="gap: 15px; margin-bottom: 15px;">
+                <div style="flex: 2;">
+                    <input type="text" id="robot-stock-search-input" placeholder="🔍 Escriba código, nombre u horas para filtrar..." style="width: 100%; height: 42px; font-size: 14px;" autofocus>
+                </div>
+                <div style="flex: 1;">
+                    <select id="robot-stock-rubro-filter" style="width: 100%; height: 42px; font-size: 13px; background: rgba(30, 41, 59, 0.6); color: white; border: 1px solid var(--glass-border);">
+                        <option value="">Todos los subrubros...</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="glass-card" style="padding: 0; overflow: hidden;">
+                <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 110px;">Código</th>
+                                <th>Concepto / Tarifario</th>
+                                <th>Categoría / Subrubro</th>
+                                <th style="text-align: right; width: 140px;">Precio Unitario ($)</th>
+                                <th style="text-align: center; width: 80px;">U.D.M.</th>
+                            </tr>
+                        </thead>
+                        <tbody id="robot-stock-results-list">
+                            <!-- Resultados dinámicos -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; font-size: 12px; color: var(--text-muted);">
+                <span>💡 Haga clic en una fila para seleccionar el ítem o las horas en la planilla.</span>
+                <span id="robot-stock-results-count">Mostrando 0 ítems</span>
+            </div>
+        </div>
+    </template>
+
+    <!-- Modal Overlay -->
+    <div id="modal-overlay" class="modal-overlay" style="display: none;" onclick="if (event.target === this) closeModal()">
+        <!-- Contenido dinámico inyectado aquí -->
+    </div>
+
+    <!-- Context Menu para Fechas (Filtros Rápidos en clic derecho) -->
+    <div id="date-context-menu" class="date-context-menu">
+        <div class="date-context-menu-item" onclick="selectDatePresetFromContextMenu('today')">
+            <i class="fa-solid fa-calendar-day"></i> Hoy
+        </div>
+        <div class="date-context-menu-item" onclick="selectDatePresetFromContextMenu('yesterday')">
+            <i class="fa-solid fa-calendar-minus"></i> Ayer
+        </div>
+        <div class="date-context-menu-item" onclick="selectDatePresetFromContextMenu('last7')">
+            <i class="fa-solid fa-calendar-week"></i> Últimos 7 días
+        </div>
+        <div class="date-context-menu-item" onclick="selectDatePresetFromContextMenu('last30')">
+            <i class="fa-solid fa-calendar-days"></i> Últimos 30 días
+        </div>
+        <div class="date-context-menu-item" onclick="selectDatePresetFromContextMenu('thisMonth')">
+            <i class="fa-solid fa-calendar"></i> Este mes
+        </div>
+        <div class="date-context-menu-item" onclick="selectDatePresetFromContextMenu('lastMonth')">
+            <i class="fa-solid fa-calendar"></i> Mes anterior
+        </div>
+    </div>
+
+    <!-- Template: Modal Elección Inicial de Tipo de Presupuesto -->
+    <template id="tpl-modal-tipo-presupuesto">
+        <div class="modal-content modal-medium" style="max-width: 680px; text-align: center; padding: 30px;">
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 44px; margin-bottom: 10px;">📋</div>
+                <h3 style="margin: 0 0 10px 0; color: white; font-size: 22px; font-weight: 700;">Seleccione el Rubro del Presupuesto</h3>
+                <p style="color: var(--text-muted); font-size: 13px; margin: 0; line-height: 1.5;">Antes de ingresar el presupuesto, seleccione el rubro. La plantilla de materiales, equipos y tarifas de mano de obra se adaptará al rubro.</p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 25px; margin-bottom: 20px;">
+                <!-- Card Mecánico -->
+                <div class="glass-card tipo-presupuesto-card" onclick="seleccionarTipoPresupuesto('Mecánico')" style="cursor: pointer; padding: 25px 20px; border: 2px solid rgba(6, 182, 212, 0.3); border-radius: 14px; transition: all 0.3s ease; background: rgba(15, 23, 42, 0.7); display: flex; flex-direction: column; align-items: center; justify-content: space-between;" onmouseover="this.style.borderColor='#22d3ee'; this.style.transform='translateY(-4px)'" onmouseout="this.style.borderColor='rgba(6, 182, 212, 0.3)'; this.style.transform='none'">
+                    <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(6, 182, 212, 0.15); color: #22d3ee; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 15px; border: 1px solid rgba(6, 182, 212, 0.4);">⚙️</div>
+                    <div style="display: inline-block; background: rgba(6, 182, 212, 0.2); color: #22d3ee; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 800; margin-bottom: 6px; border: 1px solid rgba(6, 182, 212, 0.4);">RUBRO 101 (MEC)</div>
+                    <h4 style="color: #22d3ee; margin: 0 0 10px 0; font-size: 18px; font-weight: 700;">Presupuesto Mecánico</h4>
+                    <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 20px;">Alquiler de hidroelevadores, oficinas, traslados y mano de obra de taller, parada de planta y mantenimiento mecánico.</p>
+                    <button type="button" class="btn" style="width: 100%; pointer-events: none; font-weight: 700; background: #06b6d4; color: black;">Seleccionar 101-MEC ⚙️</button>
+                </div>
+
+                <!-- Card Eléctrico -->
+                <div class="glass-card tipo-presupuesto-card" onclick="seleccionarTipoPresupuesto('Eléctrico')" style="cursor: pointer; padding: 25px 20px; border: 2px solid rgba(234, 179, 8, 0.3); border-radius: 14px; transition: all 0.3s ease; background: rgba(15, 23, 42, 0.7); display: flex; flex-direction: column; align-items: center; justify-content: space-between;" onmouseover="this.style.borderColor='#fde047'; this.style.transform='translateY(-4px)'" onmouseout="this.style.borderColor='rgba(234, 179, 8, 0.3)'; this.style.transform='none'">
+                    <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(234, 179, 8, 0.15); color: #fde047; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 15px; border: 1px solid rgba(234, 179, 8, 0.4);">⚡</div>
+                    <div style="display: inline-block; background: rgba(234, 179, 8, 0.2); color: #fde047; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 800; margin-bottom: 6px; border: 1px solid rgba(234, 179, 8, 0.4);">RUBRO 102 (ELEC)</div>
+                    <h4 style="color: #fde047; margin: 0 0 10px 0; font-size: 18px; font-weight: 700;">Presupuesto Eléctrico</h4>
+                    <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 20px;">Cañerías galvanizadas, cajas de aluminio, condulets, cables sintenax (3x1.5, 7x1.5, 485), bulonería y mano de obra eléctrica.</p>
+                    <button type="button" class="btn" style="width: 100%; pointer-events: none; font-weight: 700; background: #eab308; color: black;">Seleccionar 102-ELEC ⚡</button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template: Modal Seleccionar Tipo de Reporte (Detallado o Resumido) -->
+    <template id="tpl-modal-tipo-reporte">
+        <div class="modal-content modal-medium" style="max-width: 650px; text-align: center; padding: 30px; position: relative;">
+            <button type="button" class="btn btn-sm btn-secondary" onclick="closeModal()" style="position: absolute; top: 15px; right: 15px; font-size: 14px; padding: 4px 10px; cursor: pointer; border-radius: 6px;">✕</button>
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 44px; margin-bottom: 10px;">📊</div>
+                <h3 style="margin: 0 0 10px 0; color: white; font-size: 22px; font-weight: 700;">Seleccione el Tipo de Reporte</h3>
+                <p style="color: var(--text-muted); font-size: 13px; margin: 0; line-height: 1.5;">Elija cómo desea presentar la propuesta comercial de este presupuesto:</p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 25px; margin-bottom: 20px;">
+                <!-- Card Reporte Detallado -->
+                <div class="glass-card" onclick="confirmarConTipoReporte('detallado')" style="cursor: pointer; padding: 25px 20px; border: 2px solid rgba(2, 132, 199, 0.4); border-radius: 14px; transition: all 0.3s ease; background: rgba(15, 23, 42, 0.7); display: flex; flex-direction: column; align-items: center; justify-content: space-between;" onmouseover="this.style.borderColor='#38bdf8'; this.style.transform='translateY(-4px)'" onmouseout="this.style.borderColor='rgba(2, 132, 199, 0.4)'; this.style.transform='none'">
+                    <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(2, 132, 199, 0.15); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 15px; border: 1px solid rgba(2, 132, 199, 0.4);">📑</div>
+                    <h4 style="color: #38bdf8; margin: 0 0 10px 0; font-size: 18px; font-weight: 700;">Reporte Detallado</h4>
+                    <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 20px;">Muestra la propuesta comercial completa con todos los ítems del tarifario y desglose de tarifas.</p>
+                    <button type="button" class="btn" style="width: 100%; pointer-events: none; font-weight: 700; background: #0284c7; color: white;">Generar Detallado 📑</button>
+                </div>
+
+                <!-- Card Reporte Resumido -->
+                <div class="glass-card" onclick="confirmarConTipoReporte('resumido')" style="cursor: pointer; padding: 25px 20px; border: 2px solid rgba(16, 185, 129, 0.4); border-radius: 14px; transition: all 0.3s ease; background: rgba(15, 23, 42, 0.7); display: flex; flex-direction: column; align-items: center; justify-content: space-between;" onmouseover="this.style.borderColor='#34d399'; this.style.transform='translateY(-4px)'" onmouseout="this.style.borderColor='rgba(16, 185, 129, 0.4)'; this.style.transform='none'">
+                    <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(16, 185, 129, 0.15); color: #34d399; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 15px; border: 1px solid rgba(16, 185, 129, 0.4);">📋</div>
+                    <h4 style="color: #34d399; margin: 0 0 10px 0; font-size: 18px; font-weight: 700;">Reporte Resumido</h4>
+                    <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 20px;">Presenta la Denominación del Servicio, la cantidad global y el precio total comercial.</p>
+                    <button type="button" class="btn" style="width: 100%; pointer-events: none; font-weight: 700; background: #10b981; color: white;">Generar Resumido 📋</button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template: Modal Avance de Obra y Certificación / Facturación -->
+    <template id="tpl-modal-avance-obra">
+        <div class="modal-content modal-large" style="max-width: 780px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <button type="button" class="btn btn-sm" onclick="volverAccionAnterior()" style="font-family: inherit; font-size: 12px; font-weight: 700; height: 32px; padding: 0 12px; background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1.5px solid #38bdf8; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; cursor: pointer;" title="Volver a la bandeja">
+                        <i class="fa-solid fa-arrow-left"></i> Volver
+                    </button>
+                    <h4 style="margin: 0; font-size: 18px; color: #2dd4bf; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-hammer"></i> Avance de Obra y Certificación para Facturación
+                    </h4>
+                </div>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="closeModal()">✕</button>
+            </div>
+
+            <!-- Ficha Resumen del Presupuesto -->
+            <div style="background: rgba(15, 23, 42, 0.8); border: 1.5px solid var(--glass-border); border-radius: 12px; padding: 15px 20px; margin-bottom: 20px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 12px;">
+                    <div>
+                        <span style="font-size: 11px; color: var(--text-muted); display: block;">PRESUPUESTO</span>
+                        <strong id="avance-modal-nro" style="font-size: 15px; color: var(--primary); font-family: monospace;">-</strong>
+                    </div>
+                    <div>
+                        <span style="font-size: 11px; color: var(--text-muted); display: block;">CLIENTE</span>
+                        <strong id="avance-modal-cliente" style="font-size: 14px; color: white;">-</strong>
+                    </div>
+                    <div>
+                        <span style="font-size: 11px; color: var(--text-muted); display: block;">MONTO TOTAL PRESUPUESTADO</span>
+                        <strong id="avance-modal-total" style="font-size: 16px; color: #34d399; font-family: monospace;">$0,00</strong>
+                    </div>
+                </div>
+
+                <!-- Barra de Progreso de Avance -->
+                <div style="margin-top: 10px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
+                        <span style="color: var(--text-muted);">Avance de Obra Acumulado:</span>
+                        <strong id="avance-modal-progress-label" style="color: #2dd4bf;">0% Facturado ($0,00)</strong>
+                    </div>
+                    <div style="width: 100%; height: 12px; background: rgba(255,255,255,0.1); border-radius: 6px; overflow: hidden;">
+                        <div id="avance-modal-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #0d9488, #2dd4bf); transition: width 0.4s ease;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario de Registro de Nuevo Hito de Avance -->
+            <div class="glass-card" style="background: rgba(30, 41, 59, 0.6); border: 1.5px solid rgba(45, 212, 191, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                <h5 style="margin: 0 0 15px 0; color: #2dd4bf; font-size: 14px; font-weight: 700; text-transform: uppercase;">
+                    📝 Registrar Nuevo Avance a Facturar
+                </h5>
+
+                <!-- Botones Rápidos de Porcentaje -->
+                <div style="margin-bottom: 15px;">
+                    <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 8px;">Selección Rápida de %:</label>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button type="button" class="btn btn-sm btn-outline" onclick="setAvancePorcentajeRapido(20)" style="font-weight: 700;">+20%</button>
+                        <button type="button" class="btn btn-sm btn-outline" onclick="setAvancePorcentajeRapido(30)" style="font-weight: 700; background: rgba(45,212,191,0.1); border-color: #2dd4bf; color: #2dd4bf;">+30%</button>
+                        <button type="button" class="btn btn-sm btn-outline" onclick="setAvancePorcentajeRapido(40)" style="font-weight: 700; background: rgba(45,212,191,0.1); border-color: #2dd4bf; color: #2dd4bf;">+40%</button>
+                        <button type="button" class="btn btn-sm btn-outline" onclick="setAvancePorcentajeRapido(50)" style="font-weight: 700; background: rgba(45,212,191,0.1); border-color: #2dd4bf; color: #2dd4bf;">+50%</button>
+                        <button type="button" class="btn btn-sm btn-outline" onclick="setAvancePorcentajeRapido('restante')" style="font-weight: 700; background: rgba(16,185,129,0.2); border-color: #10b981; color: #6ee7b7;">Completar Saldo (100%)</button>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label style="font-weight: bold; color: white;">% de Avance Actual *</label>
+                        <div style="position: relative;">
+                            <input type="number" id="avance-input-pct" min="1" max="100" step="1" placeholder="Ej: 30" style="font-size: 16px; font-weight: 800; color: #2dd4bf; padding-right: 30px;" oninput="onAvancePorcentajeInput(this.value)">
+                            <span style="position: absolute; right: 12px; top: 10px; font-weight: 800; color: #2dd4bf;">%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label style="font-weight: bold; color: #34d399;">Monto Calculado a Facturar ($) *</label>
+                        <input type="text" id="avance-input-monto-display" readonly style="font-size: 16px; font-weight: 800; color: #34d399; background: rgba(15, 23, 42, 0.9); font-family: monospace; border: 1.5px solid #059669;" value="$0,00">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label style="font-weight: bold; color: white;">Fecha del Hito *</label>
+                        <input type="date" id="avance-input-fecha" style="font-size: 13px;">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label style="color: var(--text-muted); font-size: 12px;">Nro. Certificado / Remito / OC:</label>
+                        <input type="text" id="avance-input-nro-doc" placeholder="Ej: Certificado Nº 1 / OC-51240" style="font-size: 13px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label style="color: var(--text-muted); font-size: 12px;">Detalle / Etapa del Avance:</label>
+                        <input type="text" id="avance-input-detalle" placeholder="Ej: Avance 30% ingeniería y montaje inicial en planta" style="font-size: 13px;">
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                    <button type="button" class="btn btn-success" onclick="guardarAvanceObra()" style="background-color: #0d9488; border-color: #0d9488; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-paper-plane"></i> Registrar Avance y Notificar Facturación
+                    </button>
+                </div>
+            </div>
+
+            <!-- Historial de Avances Cargados -->
+            <div>
+                <h5 style="margin: 0 0 10px 0; color: white; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-list-check"></i> Historial de Certificados y Avances de este Presupuesto
+                </h5>
+                <div style="max-height: 180px; overflow-y: auto; border: 1px solid var(--glass-border); border-radius: 8px;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
+                        <thead style="background: rgba(15, 23, 42, 0.9); color: var(--text-muted); position: sticky; top: 0;">
+                            <tr>
+                                <th style="padding: 8px 12px; border-bottom: 1px solid var(--glass-border);">Fecha</th>
+                                <th style="padding: 8px 12px; border-bottom: 1px solid var(--glass-border);">% Hito</th>
+                                <th style="padding: 8px 12px; border-bottom: 1px solid var(--glass-border);">Monto a Facturar</th>
+                                <th style="padding: 8px 12px; border-bottom: 1px solid var(--glass-border);">Doc / Certificado</th>
+                                <th style="padding: 8px 12px; border-bottom: 1px solid var(--glass-border);">Detalle</th>
+                                <th style="padding: 8px 12px; border-bottom: 1px solid var(--glass-border); text-align: center;">Comprobante</th>
+                            </tr>
+                        </thead>
+                        <tbody id="avance-historial-tbody">
+                            <!-- Filas dinámicas -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template: Modal Comprobante / Certificado de Avance de Obra -->
+    <template id="tpl-modal-comprobante-avance">
+        <div class="modal-content" style="max-width: 650px; width: 95%; background: #ffffff; color: #1e293b; padding: 25px; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">
+            
+            <!-- Barra Superior de Acciones (No se imprime) -->
+            <div class="no-print" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px;">
+                <span style="font-size: 13px; font-weight: 700; color: #0f766e; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-file-circle-check"></i> Comprobante de Avance de Obra
+                </span>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" class="btn btn-sm" onclick="imprimirComprobanteAvance()" style="background: #0284c7; color: white; border: none; font-weight: 700; padding: 6px 14px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-print"></i> Imprimir / PDF
+                    </button>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="closeModal()" style="background: #e2e8f0; color: #334155; border: 1px solid #cbd5e1; font-weight: 700; padding: 6px 14px; border-radius: 6px; cursor: pointer;">
+                        ✕ Cerrar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenedor Imprimible del Comprobante -->
+            <div id="print-comprobante-avance-area" style="border: 2px solid #0f766e; border-radius: 8px; padding: 20px; background: #ffffff;">
+                
+                <!-- Encabezado con Logo y Título -->
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0f766e; padding-bottom: 12px; margin-bottom: 16px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <img id="comp-avance-logo" src="logo_sg_montajes.png" alt="Logo" style="height: 36px; width: auto; object-fit: contain;">
+                        <div>
+                            <h3 id="comp-avance-empresa" style="margin: 0; font-size: 16px; font-weight: 900; color: #0f172a; letter-spacing: 0.5px;">SG MONTAJES SRL</h3>
+                            <span style="font-size: 10.5px; color: #64748b; display: block;">Montajes Industriales & Servicios Electromecánicos</span>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="background: #0f766e; color: #ffffff; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 4px; display: inline-block; text-transform: uppercase; letter-spacing: 0.5px;">
+                            CERTIFICADO DE AVANCE
+                        </span>
+                        <div style="font-size: 11px; color: #334155; margin-top: 4px; font-weight: 600;">
+                            Fecha: <span id="comp-avance-fecha" style="font-weight: 800; color: #0f172a;">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datos de la Obra y Presupuesto -->
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px 14px; margin-bottom: 16px; font-size: 11.5px; line-height: 1.6;">
+                    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 8px;">
+                        <div>
+                            <span style="color: #64748b; font-weight: 600;">Presupuesto Ref.:</span> 
+                            <strong id="comp-avance-presupuesto-id" style="color: #0284c7; font-family: monospace;">-</strong>
+                        </div>
+                        <div>
+                            <span style="color: #64748b; font-weight: 600;">Planta:</span> 
+                            <strong id="comp-avance-planta" style="color: #0f172a;">-</strong>
+                        </div>
+                        <div>
+                            <span style="color: #64748b; font-weight: 600;">Cliente:</span> 
+                            <strong id="comp-avance-cliente" style="color: #0f172a;">-</strong>
+                        </div>
+                        <div>
+                            <span style="color: #64748b; font-weight: 600;">Orden de Compra (OC):</span> 
+                            <strong id="comp-avance-nro-oc" style="color: #0f172a;">-</strong>
+                        </div>
+                        <div style="grid-column: 1 / -1;">
+                            <span style="color: #64748b; font-weight: 600;">Denominación del Servicio:</span> 
+                            <strong id="comp-avance-denominacion" style="color: #0f172a;">-</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detalle del Hito Certificado -->
+                <div style="margin-bottom: 16px;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 11.5px; text-align: left; border: 1px solid #cbd5e1;">
+                        <thead style="background: #0f766e; color: #ffffff;">
+                            <tr>
+                                <th style="padding: 6px 10px; font-weight: 700;">Concepto</th>
+                                <th style="padding: 6px 10px; font-weight: 700; text-align: center; width: 100px;">% Avance</th>
+                                <th style="padding: 6px 10px; font-weight: 700; text-align: right; width: 140px;">Importe a Facturar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="background: #f0fdf4; border-bottom: 1px solid #cbd5e1;">
+                                <td style="padding: 8px 10px; font-weight: 700; color: #166534;">
+                                    <span id="comp-avance-doc-label">Certificado de Avance Actual</span>
+                                </td>
+                                <td style="padding: 8px 10px; text-align: center; font-weight: 800; font-size: 13px; color: #0f766e;" id="comp-avance-pct">
+                                    0%
+                                </td>
+                                <td style="padding: 8px 10px; text-align: right; font-family: monospace; font-weight: 800; font-size: 13px; color: #166534;" id="comp-avance-monto">
+                                    $0,00
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Cuadro de Estado Financiero Acumulado -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; font-size: 11px; text-align: center;">
+                    <div style="background: #f1f5f9; padding: 8px 6px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                        <span style="color: #64748b; display: block; font-weight: 600;">Total Presupuesto</span>
+                        <strong id="comp-avance-total-presupuesto" style="color: #0f172a; font-family: monospace; font-size: 12px;">$0,00</strong>
+                    </div>
+                    <div style="background: #e6fffa; padding: 8px 6px; border-radius: 6px; border: 1px solid #99f6e4;">
+                        <span style="color: #0d9488; display: block; font-weight: 600;">Acumulado a la Fecha</span>
+                        <strong id="comp-avance-acumulado-display" style="color: #0f766e; font-family: monospace; font-size: 12px;">0% ($0,00)</strong>
+                    </div>
+                    <div style="background: #fffbeb; padding: 8px 6px; border-radius: 6px; border: 1px solid #fde68a;">
+                        <span style="color: #b45309; display: block; font-weight: 600;">Saldo Pendiente</span>
+                        <strong id="comp-avance-saldo-display" style="color: #b45309; font-family: monospace; font-size: 12px;">100% ($0,00)</strong>
+                    </div>
+                </div>
+
+                <!-- Tareas Realizadas / Observaciones -->
+                <div style="border: 1px dashed #cbd5e1; border-radius: 6px; padding: 10px 12px; margin-bottom: 20px; font-size: 11px; background: #fafafa;">
+                    <strong style="color: #334155; display: block; margin-bottom: 4px;">Detalle de Trabajos y Tareas Ejecutadas:</strong>
+                    <p id="comp-avance-detalle-texto" style="margin: 0; color: #475569; font-style: italic; white-space: pre-wrap;">-</p>
+                </div>
+
+                <!-- Firmas de Conformidad -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px; padding-top: 10px; font-size: 11px; text-align: center;">
+                    <div style="border-top: 1px solid #64748b; padding-top: 6px;">
+                        <span style="color: #0f172a; font-weight: 700; display: block;">Firma y Aclaración Responsable</span>
+                        <span id="comp-avance-firma-empresa" style="color: #64748b; font-size: 10px;">SG MONTAJES SRL</span>
+                    </div>
+                    <div style="border-top: 1px solid #64748b; padding-top: 6px;">
+                        <span style="color: #0f172a; font-weight: 700; display: block;">Conformidad Inspección / Cliente</span>
+                        <span id="comp-avance-firma-cliente" style="color: #64748b; font-size: 10px;">CARGILL SACI</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </template>
+
+    <!-- Template: Modal Agregar Vista Personalizada -->
+    <template id="tpl-modal-nueva-vista">
+        <div class="modal-content" style="max-width: 480px; width: 95%;">
+            <div class="modal-header">
+                <h3 style="display: flex; align-items: center; gap: 8px; font-size: 16px; margin: 0; color: #38bdf8;">
+                    <i class="fas fa-table-columns"></i> ➕ Agregar Nueva Vista
+                </h3>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <div style="padding: 15px 0 5px 0;">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="font-size: 12px; font-weight: 700; color: white; margin-bottom: 5px; display: block;">Nombre de la Vista *</label>
+                    <input type="text" id="nueva-vista-nombre" class="form-control" placeholder="Ej: Agrupado por Estado, Mis Aprobados..." style="font-size: 13px;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="font-size: 12px; font-weight: 700; color: white; margin-bottom: 5px; display: block;">Modo de Agrupación</label>
+                    <select id="nueva-vista-agrupacion" class="form-control" style="font-size: 13px;">
+                        <option value="">📂 Sin Agrupar (Lista estándar)</option>
+                        <option value="estado">📂 Agrupar por Estado</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="font-size: 12px; font-weight: 700; color: white; margin-bottom: 5px; display: block;">Filtro de Estado por Defecto</label>
+                    <select id="nueva-vista-filtro-estado" class="form-control" style="font-size: 13px;">
+                        <option value="">📋 Todos los estados</option>
+                        <option value="Enviado sin OC">📤 Enviado sin OC</option>
+                        <option value="Aprobado sin OC">⏳ Aprobado sin OC</option>
+                        <option value="Aprobado con OC">✅ Aprobado con OC</option>
+                        <option value="Facturado Parcial">🧾 Facturado Parcial</option>
+                        <option value="Facturado Total">💎 Facturado Total</option>
+                        <option value="Rechazado">❌ Rechazado</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="guardarNuevaVistaPersonalizada()" style="font-weight: 700;">
+                        <i class="fas fa-save"></i> Guardar Vista
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Script de bases de datos locales precargadas desde compilar_datos.py -->
+    <script src="condiciones_db.js?v=18"></script>
+    <script src="depositos_db.js?v=18"></script>
+    <script src="transportes_db.js?v=18"></script>
+    <script src="clientes_db.js?v=18"></script>
+    <script src="stock_db.js?v=18"></script>
+    <script src="vendedores_db.js?v=18"></script>
+    <script src="presupuestos_catalog_db.js?v=20"></script>
+    
+    <!-- Firebase SDK (compat mode) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <!-- Script principal de lógica de negocio -->
+    <script src="app.js?v=110"></script>
+</body>
+</html>

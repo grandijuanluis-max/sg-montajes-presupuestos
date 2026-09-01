@@ -1,0 +1,30 @@
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "firestore.rules",
+      "**/.*",
+      "**/node_modules/**",
+      "firebase",
+      "install_firebase.sh",
+      "prompt_completo.md",
+      "CLIENTESPALA.DBI",
+      "CLIENTESPALA.FPT",
+      "CONDICIONPALA.DBI",
+      "CONDICIONPALA.FPT",
+      "DEPOSITOPALA.DBI",
+      "DEPOSITOPALA.FPT",
+      "STOCKPALA.DBI",
+      "STOCKPALA.FPT",
+      "TRANSPORTEPALA.DBI",
+      "VENDEDORPALA.DBI",
+      "VENDEDORPALA.FPT",
+      "inspect_stock.py",
+      "compilar_datos.py"
+    ]
+  }
+}
