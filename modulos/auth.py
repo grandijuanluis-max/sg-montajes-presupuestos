@@ -64,15 +64,21 @@ def check_login() -> None:
 
 
 def login_form() -> None:
+    from modulos.theme import close_login_header, render_login_header
+
     store = get_store()
-    st.caption(f"Motor de datos: **{store.backend}**")
-    with st.form("login_form"):
-        st.text_input("Usuario o email", key="login_identificador")
-        st.text_input("Contraseña", type="password", key="login_password")
-        st.form_submit_button("Ingresar", on_click=check_login)
-    if st.session_state.get("login_error"):
-        st.error(st.session_state["login_error"])
-    st.caption("Usuario inicial: `mel` / `123`  ·  Ventas: `ventas` / `123`")
+    left, mid, right = st.columns([1, 1.15, 1])
+    with mid:
+        render_login_header()
+        st.caption(f"Motor de datos: **{store.backend}**")
+        with st.form("login_form"):
+            st.text_input("Usuario", key="login_identificador", placeholder="Ingrese su usuario")
+            st.text_input("Contraseña", type="password", key="login_password", placeholder="••••••••")
+            st.form_submit_button("Ingresar", use_container_width=True, on_click=check_login)
+        if st.session_state.get("login_error"):
+            st.error(st.session_state["login_error"])
+        st.caption("Usuario inicial: `mel` / `123`  ·  Ventas: `ventas` / `123`")
+        close_login_header()
 
 
 def logout() -> None:

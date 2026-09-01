@@ -2,13 +2,15 @@ import streamlit as st
 
 st.set_page_config(
     page_title="SG MONTAJES — Presupuestos",
-    page_icon="📋",
+    page_icon="logo_sg_montajes.png",
     layout="wide",
+    initial_sidebar_state="expanded",
 )
 
 from modulos.auth import login_form, logout, tiene_permiso
 from modulos.constants import MENU_POR_PERMISO
 from modulos.db import get_store
+from modulos.theme import MENU_ICONOS, apply_theme, render_sidebar_brand, render_topbar
 from modulos.ui_clientes import render_clientes
 from modulos.ui_estadisticas import render_estadisticas
 from modulos.ui_listados import render_listado
@@ -17,23 +19,18 @@ from modulos.ui_usuarios import render_usuarios
 
 
 def main():
+    apply_theme()
+
     if "logged_in" not in st.session_state:
         st.session_state["logged_in"] = False
 
     if not st.session_state["logged_in"]:
-        col, _ = st.columns([1, 1])
-        with col:
-            st.title("SG MONTAJES")
-            st.subheader("Gestión de Presupuestos")
-            login_form()
+        login_form()
         return
 
     store = get_store()
     with st.sidebar:
-        st.markdown("**SG MONTAJES**")
-        st.write(f"Usuario: **{st.session_state.get('username')}**")
-        st.write(f"Rol: **{st.session_state.get('role')}**")
-        st.caption(f"Datos: {store.backend}")
+        render_sidebar_brand(store.backend)
         st.divider()
 
         menu = [label for clave, label in MENU_POR_PERMISO if tiene_permiso(clave)]
@@ -41,11 +38,15 @@ def main():
             st.warning("Sin módulos habilitados.")
             seleccion = None
         else:
-            seleccion = st.radio("Navegación", menu)
+            visible = [MENU_ICONOS.get(m, m) for m in menu]
+            elegido = st.radio("Navegación", visible, label_visibility="collapsed")
+            seleccion = next((m for m in menu if MENU_ICONOS.get(m, m) == elegido), elegido)
 
         st.divider()
         if st.button("Cerrar sesión"):
             logout()
+
+    render_topbar()
 
     if seleccion == "Gestión de Presupuestos":
         render_alta_presupuesto()
