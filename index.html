@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="styles.css?v=18">
+    <link rel="stylesheet" href="styles.css?v=66">
 </head>
 <body>
     <div id="app">
@@ -44,10 +44,6 @@
             <header class="glass-header">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <button id="sidebar-toggle" class="btn btn-sm" title="Alternar Menú">☰</button>
-                    <!-- Botón Volver a la Acción Anterior -->
-                    <button id="btn-global-volver" class="btn btn-sm btn-nav-volver" onclick="volverAccionAnterior()" title="Volver a la acción o pantalla anterior (Alt + ←)" style="display: inline-flex; align-items: center; gap: 6px; background: rgba(15, 23, 42, 0.7); border: 1.5px solid rgba(56, 189, 248, 0.5); color: #38bdf8; font-weight: 700; font-size: 12px; height: 32px; padding: 0 12px; border-radius: 6px; transition: all 0.2s ease; cursor: pointer;">
-                        <i class="fa-solid fa-arrow-left"></i> <span>Volver</span>
-                    </button>
                     <div class="logo" style="display: flex; align-items: center; gap: 10px;">
                         <img src="logo_sg_montajes.png" alt="SG MONTAJES Logo" style="width: auto; height: 28px; object-fit: contain;">
                         <span style="font-weight: 800; font-size: 14px; letter-spacing: 0.5px;">SG <span style="font-weight: 400; color: var(--warning);">MONTAJES</span></span>
@@ -317,8 +313,8 @@
                     </div>
                 </div>
 
-                <!-- Lista de Módulos con Checkboxes Interactivos -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
+                <!-- Matriz de Módulos y Permisos -->
+                <div class="config-permisos-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-bottom: 25px;">
                     <label id="card-perm-menu-ingresar" class="glass-card perm-card" style="display: flex; align-items: center; justify-content: space-between; padding: 14px; margin: 0; cursor: pointer; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 23, 42, 0.5); border-radius: 10px; transition: all 0.2s;">
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <input type="checkbox" id="perm-menu-ingresar" class="perm-checkbox" value="menu-ingresar" onchange="onPermisoCheckboxChange()" style="width: 18px; height: 18px; accent-color: #10b981; cursor: pointer;">
@@ -330,16 +326,6 @@
                         <span id="badge-perm-menu-ingresar" class="perm-status-badge" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px;">-</span>
                     </label>
 
-                    <label id="card-perm-menu-asignaciones" class="glass-card perm-card" style="display: flex; align-items: center; justify-content: space-between; padding: 14px; margin: 0; cursor: pointer; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 23, 42, 0.5); border-radius: 10px; transition: all 0.2s;">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <input type="checkbox" id="perm-menu-asignaciones" class="perm-checkbox" value="menu-asignaciones" onchange="onPermisoCheckboxChange()" style="width: 18px; height: 18px; accent-color: #10b981; cursor: pointer;">
-                            <div>
-                                <strong style="display: block; color: white; font-size: 13px;">✅ Autorización de Presupuestos</strong>
-                                <span style="font-size: 11px; color: var(--text-muted);">Aprobar o rechazar presupuestos pendientes</span>
-                            </div>
-                        </div>
-                        <span id="badge-perm-menu-asignaciones" class="perm-status-badge" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px;">-</span>
-                    </label>
 
                     <label id="card-perm-menu-estado-presupuesto" class="glass-card perm-card" style="display: flex; align-items: center; justify-content: space-between; padding: 14px; margin: 0; cursor: pointer; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 23, 42, 0.5); border-radius: 10px; transition: all 0.2s;">
                         <div style="display: flex; align-items: center; gap: 12px;">
@@ -363,15 +349,58 @@
                         <span id="badge-perm-menu-rechazados" class="perm-status-badge" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px;">-</span>
                     </label>
 
-                    <label id="card-perm-menu-all" class="glass-card perm-card" style="display: flex; align-items: center; justify-content: space-between; padding: 14px; margin: 0; cursor: pointer; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 23, 42, 0.5); border-radius: 10px; transition: all 0.2s;">
+                    <!-- Módulo Seguimiento con sus dos parámetros configurables (Visualizar Comprobante / Historial y Editar) -->
+                    <div id="card-perm-menu-all" class="glass-card perm-card card-seguimiento-master" style="padding: 14px; margin: 0; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 23, 42, 0.5); border-radius: 10px; transition: all 0.2s; grid-column: 1 / -1;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px;">
+                            <label style="display: flex; align-items: center; gap: 12px; margin: 0; cursor: pointer;">
+                                <input type="checkbox" id="perm-menu-all" class="perm-checkbox" value="menu-all" onchange="onSeguimientoMasterChange()" style="width: 18px; height: 18px; accent-color: #10b981; cursor: pointer;">
+                                <div>
+                                    <strong style="display: block; color: white; font-size: 14px;">🕒 Seguimiento (Historial & Gestión)</strong>
+                                    <span style="font-size: 11px; color: var(--text-muted);">Módulo general de consulta histórica, visualización de comprobantes y gestión de obras</span>
+                                </div>
+                            </label>
+                            <span id="badge-perm-menu-all" class="perm-status-badge" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px;">-</span>
+                        </div>
+                        
+                        <!-- Parámetros Internos de Seguimiento -->
+                        <div class="seguimiento-params-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-top: 8px;">
+                            <!-- Parámetro 1: Visualizar Comprobante / Historial -->
+                            <label id="card-perm-menu-all-ver" style="display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                                <input type="checkbox" id="perm-menu-all-ver" class="perm-sub-checkbox" value="menu-all-ver" onchange="onSeguimientoSubPermChange()" style="width: 16px; height: 16px; accent-color: #0284c7; cursor: pointer; margin-top: 2px;">
+                                <div>
+                                    <strong style="display: flex; align-items: center; gap: 6px; color: #38bdf8; font-size: 12px;">
+                                        <i class="fas fa-eye"></i> 1. Visualizar Comprobante / Historial
+                                    </strong>
+                                    <span style="font-size: 10.5px; color: var(--text-muted); display: block; margin-top: 2px; line-height: 1.3;">
+                                        Consulta la planilla oficial, ítems cotizados, montos y trazabilidad en modo solo lectura (Historial / Auditoría).
+                                    </span>
+                                </div>
+                            </label>
+
+                            <!-- Parámetro 2: Editar Presupuesto y Avance de Obra -->
+                            <label id="card-perm-menu-all-edit" style="display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                                <input type="checkbox" id="perm-menu-all-edit" class="perm-sub-checkbox" value="menu-all-edit" onchange="onSeguimientoSubPermChange()" style="width: 16px; height: 16px; accent-color: #f59e0b; cursor: pointer; margin-top: 2px;">
+                                <div>
+                                    <strong style="display: flex; align-items: center; gap: 6px; color: #fde047; font-size: 12px;">
+                                        <i class="fas fa-edit"></i> 2. Editar y Avance de Obra
+                                    </strong>
+                                    <span style="font-size: 10.5px; color: var(--text-muted); display: block; margin-top: 2px; line-height: 1.3;">
+                                        Habilita modificar artículos/condiciones, cargar hitos de avance de obra y crear presupuestos basados.
+                                    </span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <label id="card-perm-menu-metrics" class="glass-card perm-card" style="display: flex; align-items: center; justify-content: space-between; padding: 14px; margin: 0; cursor: pointer; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 23, 42, 0.5); border-radius: 10px; transition: all 0.2s;">
                         <div style="display: flex; align-items: center; gap: 12px;">
-                            <input type="checkbox" id="perm-menu-all" class="perm-checkbox" value="menu-all" onchange="onPermisoCheckboxChange()" style="width: 18px; height: 18px; accent-color: #10b981; cursor: pointer;">
+                            <input type="checkbox" id="perm-menu-metrics" class="perm-checkbox" value="menu-metrics" onchange="onPermisoCheckboxChange()" style="width: 18px; height: 18px; accent-color: #10b981; cursor: pointer;">
                             <div>
-                                <strong style="display: block; color: white; font-size: 13px;">🕒 Seguimiento</strong>
-                                <span style="font-size: 11px; color: var(--text-muted);">Seguimiento, historial y modificación de presupuestos</span>
+                                <strong style="display: block; color: white; font-size: 13px;">📊 Estadísticas y BI</strong>
+                                <span style="font-size: 11px; color: var(--text-muted);">Acceso a tablero de métricas de facturación y gráficos comerciales</span>
                             </div>
                         </div>
-                        <span id="badge-perm-menu-all" class="perm-status-badge" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px;">-</span>
+                        <span id="badge-perm-menu-metrics" class="perm-status-badge" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px;">-</span>
                     </label>
 
                     <label id="card-perm-menu-admin" class="glass-card perm-card" style="display: flex; align-items: center; justify-content: space-between; padding: 14px; margin: 0; cursor: pointer; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 23, 42, 0.5); border-radius: 10px; transition: all 0.2s;">
@@ -476,18 +505,8 @@
                             </div>
                             <div id="req-client-dropdown" class="custom-dropdown" style="display: none;"></div>
                         </div>
-                        
-                        <!-- Depósito (Column 3) -->
-                        <div class="form-group" style="position: relative; margin-bottom: 0;">
-                            <label>Depósito <span style="color: var(--primary);">*</span></label>
-                            <div style="position: relative; display: flex; align-items: center;">
-                                <input type="text" id="req-deposit-input" autocomplete="off" placeholder="Buscar depósito..." required style="padding-right: 35px; height: 42px;">
-                                <i class="fas fa-search" style="position: absolute; right: 12px; color: var(--primary); cursor: pointer;" onclick="abrirRobotDepositos()"></i>
-                            </div>
-                            <div id="req-deposit-dropdown" class="custom-dropdown" style="display: none;"></div>
-                        </div>
 
-                        <!-- Condición de Venta (Column 1) -->
+                        <!-- Condición de Venta (Column 3) -->
                         <div class="form-group" style="position: relative; margin-bottom: 0;">
                             <label>Condición de Venta <span style="color: var(--primary);">*</span></label>
                             <div style="position: relative; display: flex; align-items: center;">
@@ -495,13 +514,12 @@
                                 <i class="fas fa-search" style="position: absolute; right: 12px; color: var(--primary); cursor: pointer;" onclick="abrirRobotCondiciones()"></i>
                             </div>
                             <div id="req-condition-dropdown" class="custom-dropdown" style="display: none;"></div>
-                            <!-- Campo oculto para guardar el código seleccionado de la condición de venta -->
                             <input type="hidden" id="req-condition" name="req-condition" value="">
                         </div>
 
-                        <!-- Moneda & Cotización (Column 2) -->
-                        <div class="form-row" style="gap: 15px; margin-bottom: 0;">
-                            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                        <!-- Moneda & Cotización (Column 1) -->
+                        <div class="form-row" style="gap: 15px; margin-bottom: 0; grid-column: span 3;">
+                            <div class="form-group" style="max-width: 250px; margin-bottom: 0;">
                                 <label>Moneda</label>
                                 <select id="req-currency" required onchange="onReqCurrencyChange()" style="cursor: pointer; height: 42px;">
                                     <option value="1">1 - Pesos</option>
@@ -509,20 +527,28 @@
                                     <option value="60">60 - Euros</option>
                                 </select>
                             </div>
-                            <div id="req-exchange-rate-container" class="form-group" style="display: none; flex: 1; margin-bottom: 0;">
+                            <div id="req-exchange-rate-container" class="form-group" style="display: none; max-width: 200px; margin-bottom: 0;">
                                 <label>Cotización</label>
                                 <input type="text" id="req-exchange-rate" value="1.00000000" style="font-family: monospace; text-align: right; height: 42px;">
                             </div>
                         </div>
 
-                        <!-- Transporte (Column 3) -->
-                        <div class="form-group" style="position: relative; margin-bottom: 0;">
-                            <label>Transporte <span style="color: var(--primary);">*</span></label>
-                            <div style="position: relative; display: flex; align-items: center;">
-                                <input type="text" id="req-transport-input" autocomplete="off" placeholder="Buscar transporte..." required style="padding-right: 35px; height: 42px;">
-                                <i class="fas fa-search" style="position: absolute; right: 12px; color: var(--primary); cursor: pointer;" onclick="abrirRobotTransportes()"></i>
+                        <!-- Parámetro de Autorización Comercial -->
+                        <div class="form-group" style="grid-column: span 3; margin-top: 6px; margin-bottom: 0; background: rgba(15, 23, 42, 0.6); border: 1.5px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <input type="checkbox" id="req-requiere-autorizacion" checked onchange="onRequiereAuthToggle()" style="width: 18px; height: 18px; accent-color: #38bdf8; cursor: pointer;">
+                                <div>
+                                    <label for="req-requiere-autorizacion" style="margin: 0; font-weight: 800; font-size: 13px; color: #ffffff; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                                        <i class="fa-solid fa-clipboard-check" style="color: #38bdf8;"></i> Requiere Autorización Comercial
+                                    </label>
+                                    <span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 2px;">
+                                        Si está <strong>tildado</strong>, va a la bandeja de <strong>Autorización</strong>. Si se <strong>destilda</strong>, se saltea la autorización y pasa directamente a <strong>Aprobado</strong>.
+                                    </span>
+                                </div>
                             </div>
-                            <div id="req-transport-dropdown" class="custom-dropdown" style="display: none;"></div>
+                            <span id="req-auth-status-preview" style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 6px; background: rgba(245, 158, 11, 0.2); color: #fde68a; border: 1px solid rgba(245, 158, 11, 0.4); white-space: nowrap;">
+                                📥 Va a Autorización
+                            </span>
                         </div>
                     </div>
 
@@ -593,7 +619,7 @@
                             <!-- viii. Duración estimada de la Ejecución -->
                             <div style="display: grid; grid-template-columns: 240px 1fr; gap: 10px; align-items: center;">
                                 <label id="lbl-meca-duracion" style="font-size: 12px; font-style: italic; font-weight: 700; color: rgba(255,255,255,0.75);">viii. <u>Duración estimada de la Ejecución:</u></label>
-                                <input type="text" id="req-meca-duracion" placeholder="Ej: 25-30días" style="background: rgba(234, 179, 8, 0.08); color: #ffffff; border: 1.5px solid rgba(234, 179, 8, 0.35); border-radius: 6px; padding: 8px 12px; font-size: 13px;" onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('req-meca-fecha-fin')?.focus();}">
+                                <input type="text" id="req-meca-duracion" placeholder="" value="" style="background: rgba(234, 179, 8, 0.08); color: #ffffff; border: 1.5px solid rgba(234, 179, 8, 0.35); border-radius: 6px; padding: 8px 12px; font-size: 13px;" onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('req-meca-fecha-fin')?.focus();}">
                             </div>
 
                             <!-- ix. Plazo Máximo de Finalización -->
@@ -717,7 +743,7 @@
                     <h4 style="display: flex; align-items: center; gap: 8px; color: var(--primary); font-size: 16px; margin: 0;">
                         <i class="fa-solid fa-clipboard-check"></i> Resumen del Presupuesto
                     </h4>
-                    <p style="font-size: 12px; color: var(--text-muted); margin: 4px 0 0 0;">Verifique los datos cargados antes de enviar el Presupuesto a autorización.</p>
+                    <p style="font-size: 12px; color: var(--text-muted); margin: 4px 0 0 0;">Verifique los datos cargados antes de confirmar y cargar el presupuesto comercial.</p>
                 </div>
 
                 <!-- Grid de Resumen -->
@@ -755,6 +781,10 @@
                         <div>
                             <span style="color: var(--text-muted); font-size: 11px; display: block; margin-bottom: 2px;">FORMA DE PAGO</span>
                             <strong id="summary-forma-pago" style="color: white;">-</strong>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-muted); font-size: 11px; display: block; margin-bottom: 2px;">AUTORIZACIÓN COMERCIAL</span>
+                            <strong id="summary-requiere-auth" style="color: #fde68a; font-size: 12px; font-weight: 800;">SÍ (Va a Autorización)</strong>
                         </div>
                     </div>
 
@@ -1162,82 +1192,85 @@
 
     <!-- Template: Modal de Autorización PRESEA (Aprobación / Rechazo) -->
     <template id="tpl-modal-auth">
-        <div class="modal-content modal-large">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <button type="button" class="btn btn-sm" onclick="volverAccionAnterior()" style="font-family: inherit; font-size: 12px; font-weight: 700; height: 34px; padding: 0 12px; background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1.5px solid #38bdf8; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; cursor: pointer;" title="Volver a la bandeja">
-                        <i class="fa-solid fa-arrow-left"></i> Volver
+        <div class="modal-content modal-large modal-auth-wrapper">
+            <!-- Barra Superior del Modal (Título, Botón Volver y Cerrar) -->
+            <div class="modal-auth-topbar">
+                <div class="modal-auth-title-box">
+                    <button type="button" class="btn btn-sm btn-modal-nav-back" onclick="volverAccionAnterior()" title="Volver a la bandeja">
+                        <i class="fa-solid fa-arrow-left"></i> <span>Volver</span>
                     </button>
-                    <h4 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 8px; white-space: nowrap;">
+                    <h4 class="modal-auth-title">
                         📄 Comprobante de Presupuesto
                     </h4>
                 </div>
-                <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
-                    <button id="btn-modal-avance-obra" type="button" class="btn btn-sm" onclick="abrirModalAvanceObra(pedidoActivo.id)" style="font-family: inherit; font-size: 12px; font-weight: 700; height: 34px; padding: 0 12px; background: #0d9488; color: #ffffff; border: 1px solid #0d9488; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;" title="Registrar Avance de Obra (%) y notificar facturación">
-                        <i class="fas fa-hammer"></i> Avance de Obra
+                <button type="button" class="btn btn-sm btn-modal-close-top" onclick="closeModal()" title="Cerrar comprobante">
+                    ✕
+                </button>
+            </div>
+
+            <!-- Barra de Acciones y Toggle de Formato (Detallado / Resumido) -->
+            <div class="modal-auth-actions-bar">
+                <!-- Selector Detallado / Resumido -->
+                <div id="auth-report-type-toggle-container" class="report-type-toggle-group">
+                    <button type="button" id="btn-toggle-report-detallado" onclick="cambiarTipoReporteEnVista('detallado')">
+                        <i class="fas fa-file-lines"></i> <span>Detallado</span>
                     </button>
-                    <button id="btn-modal-basar-presupuesto" type="button" class="btn btn-sm" onclick="crearPresupuestoBasadoEnActual()" style="font-family: inherit; font-size: 12px; font-weight: 700; height: 34px; padding: 0 12px; background: #7c3aed; color: #ffffff; border: 1px solid #7c3aed; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;" title="Crear un nuevo presupuesto precompletando los datos de este">
-                        <i class="fas fa-copy"></i> Crear presupuesto basado en este
+                    <button type="button" id="btn-toggle-report-resumido" onclick="cambiarTipoReporteEnVista('resumido')">
+                        <i class="fas fa-clipboard-list"></i> <span>Resumido</span>
                     </button>
-                    <div id="auth-report-type-toggle-container" style="display: inline-flex; height: 34px; background: rgba(15, 23, 42, 0.7); padding: 2px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); align-items: center; box-sizing: border-box;">
-                        <button type="button" id="btn-toggle-report-detallado" onclick="cambiarTipoReporteEnVista('detallado')" style="font-family: inherit; font-size: 12px; font-weight: 700; height: 28px; padding: 0 10px; border-radius: 4px; border: none; cursor: pointer; background: #0284c7; color: #ffffff; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">
-                            <i class="fas fa-file-lines"></i> Detallado
-                        </button>
-                        <button type="button" id="btn-toggle-report-resumido" onclick="cambiarTipoReporteEnVista('resumido')" style="font-family: inherit; font-size: 12px; font-weight: 700; height: 28px; padding: 0 10px; border-radius: 4px; border: none; cursor: pointer; background: transparent; color: var(--text-muted); display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">
-                            <i class="fas fa-clipboard-list"></i> Resumido
-                        </button>
-                    </div>
-                    <button type="button" class="btn btn-sm" onclick="compartirWhatsAppPedido(pedidoActivo.id)" style="font-family: inherit; font-size: 12px; font-weight: 700; height: 34px; padding: 0 12px; background: #16a34a; color: #ffffff; border: 1px solid #16a34a; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
-                        <i class="fab fa-whatsapp"></i> WhatsApp
+                </div>
+
+                <!-- Botonera de Gestión y Compartir -->
+                <div class="modal-auth-buttons-group">
+                    <button id="btn-modal-editar-presupuesto" type="button" class="btn btn-sm" onclick="verDetallePedido(pedidoActivo.id, 'editar')" style="background: #f59e0b; color: #0f172a; font-weight: 800; border: 1px solid #d97706; border-radius: 6px; padding: 4px 10px; display: none; align-items: center; gap: 5px;" title="Editar los artículos y datos del presupuesto">
+                        <i class="fas fa-edit"></i> <span>Editar</span>
                     </button>
-                    <button type="button" class="btn btn-sm" onclick="enviarEmailPedido(pedidoActivo.id)" style="font-family: inherit; font-size: 12px; font-weight: 700; height: 34px; padding: 0 12px; background: #0284c7; color: #ffffff; border: 1px solid #0284c7; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
-                        <i class="fas fa-envelope"></i> Enviar por Email
+                    <button id="btn-modal-avance-obra" type="button" class="btn btn-sm btn-modal-avance" onclick="abrirModalAvanceObra(pedidoActivo.id)" style="display: none;" title="Registrar Avance de Obra (%) y notificar facturación">
+                        <i class="fas fa-hammer"></i> <span>Avance</span>
                     </button>
-                    <button type="button" class="btn btn-sm" onclick="window.print()" style="font-family: inherit; font-size: 12px; font-weight: 700; height: 34px; padding: 0 12px; background: rgba(255,255,255,0.1); color: #ffffff; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
-                        <i class="fas fa-print"></i> Imprimir / PDF
+                    <button id="btn-modal-basar-presupuesto" type="button" class="btn btn-sm btn-modal-basar" onclick="crearPresupuestoBasadoEnActual()" style="display: none;" title="Crear un nuevo presupuesto precompletando los datos de este">
+                        <i class="fas fa-copy"></i> <span>Basar Pres.</span>
                     </button>
-                    <button type="button" class="btn btn-sm" onclick="closeModal()" style="font-family: inherit; font-size: 14px; font-weight: 700; height: 34px; width: 34px; padding: 0; background: rgba(255,255,255,0.1); color: #ffffff; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; display: inline-flex; align-items: center; justify-content: center;">
-                        ✕
+                    <button type="button" class="btn btn-sm btn-modal-wa" onclick="compartirWhatsAppPedido(pedidoActivo.id)" title="Enviar por WhatsApp">
+                        <i class="fab fa-whatsapp"></i> <span>WhatsApp</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-modal-email" onclick="enviarEmailPedido(pedidoActivo.id)" title="Enviar por Correo Electrónico">
+                        <i class="fas fa-envelope"></i> <span>Email</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-modal-print" onclick="imprimirPresupuestoModal()" title="Imprimir / Exportar a PDF">
+                        <i class="fas fa-print"></i> <span>PDF / Imprimir</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Selector de Cambio Directo de Estado del Presupuesto (Solo visible en Modo Modificación) -->
-            <div style="margin-bottom: 12px; padding: 10px 16px; background: rgba(30, 41, 59, 0.7); border: 1px solid var(--glass-border); border-radius: 10px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;">
-                <div id="modal-status-edit-group" style="display: flex; align-items: center; gap: 10px;">
-                    <span style="font-weight: 700; color: var(--primary); font-size: 13px;">✏️ Modificar Estado:</span>
-                    <select id="modal-change-status-select" style="background: rgba(15, 23, 42, 0.85); color: white; border: 1px solid var(--glass-border); padding: 5px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;" onchange="ejecutarCambioEstadoPresupuesto(this.value)">
-                        <option value="Enviado sin OC">📤 Enviado sin OC</option>
-                        <option value="Aprobado sin OC">⏳ Aprobado sin OC</option>
-                        <option value="Aprobado con OC">✅ Aprobado con OC</option>
-                        <option value="Facturado Parcial">🧾 Facturado Parcial</option>
-                        <option value="Facturado Total">💎 Facturado Total</option>
-                        <option value="Rechazado">❌ Rechazado</option>
-                    </select>
+            <!-- Estado del Presupuesto (Badge Informativo) -->
+            <div class="modal-auth-status-bar">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-weight: 700; color: var(--text-muted); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.5px;">Estado Comercial:</span>
                 </div>
                 <div id="modal-status-badge-container"></div>
             </div>
 
+            <!-- Contenedor con Desplazamiento Táctil Fluido para Teléfonos Móviles -->
+            <div class="sheet-viewport-wrapper">
+                <div class="mobile-only-scroll-hint">
+                    <i class="fa-solid fa-arrows-left-right"></i> Deslice horizontalmente para consultar la planilla completa
+                </div>
+                <div class="palaversich-sheet" style="position: relative; overflow: hidden;">
+                <!-- Marca de Agua Central SG MONTAJES (Marca personal oficial PRESEA) -->
+                <div class="sheet-watermark" aria-hidden="true">
+                    <img src="logo_sg_montajes.png" alt="Marca de agua SG MONTAJES">
+                </div>
 
-
-            <!-- Hoja blanca simulando el Presupuesto Oficial de SG MONTAJES -->
-            <div class="mobile-only" style="font-size: 11px; color: var(--primary); text-align: center; margin: 5px 0 10px 0; background: rgba(6, 182, 212, 0.1); padding: 8px; border-radius: 6px; border: 1px dashed var(--glass-border);">
-                <i class="fa-solid fa-left-right"></i> Deslice la planilla hacia los lados para verla completa
-            </div>
-            
-            <div class="palaversich-sheet">
                 <!-- Cabecera Oficial -->
-                <div class="invoice-header">
+                <div class="invoice-header" style="background: rgba(30, 41, 59, 0.78); backdrop-filter: blur(2px);">
                     <!-- Caja Izquierda: Logo y Empresa -->
                     <div class="header-box header-left">
-                        <div class="logo-container">
-                            <img src="logo_sg_montajes.png" alt="SG MONTAJES Logo" style="height: 38px; width: auto; object-fit: contain;">
-                            <div class="logo-text">
-                                <span class="brand-name" style="font-size: 17px; font-weight: bold; color: #ffffff;">SG MONTAJES</span>
-                            </div>
+                        <div class="logo-container" style="display: flex; align-items: center; margin-bottom: 6px;">
+                            <img src="logo_sg_montajes.png" alt="SG MONTAJES" style="height: 48px; max-height: 48px; width: auto; max-width: 220px; object-fit: contain; display: block;">
                         </div>
-                        <div class="company-details" style="font-size: 10px; line-height: 1.3; color: var(--text-muted);">
-                            <strong style="color: #ffffff;">I.V.A. Responsable Inscripto</strong><br>
+                        <div class="company-details" style="font-size: 10px; line-height: 1.3; color: #94a3b8;">
+                            <strong style="color: #f8fafc;">I.V.A. Responsable Inscripto</strong><br>
                             Av. Pellegrini 1234 (CP 2000)<br>
                             Rosario - Pcia. Santa Fe
                         </div>
@@ -1252,105 +1285,80 @@
                     <!-- Caja Derecha: Título e Identificación -->
                     <div class="header-box header-right">
                         <div class="invoice-title">PRESUPUESTO</div>
-                        <div class="invoice-number">Nro. <span id="auth-id">00000-00014873</span></div>
-                        <div class="invoice-date">Fecha: <span id="auth-date-val">17/09/2023</span></div>
-                        <div id="auth-header-oc-container" style="font-size: 10px; font-weight: 800; margin-top: 3px; background: rgba(2, 132, 199, 0.15); padding: 2px 6px; border-radius: 4px; border: 1px dashed #0284c7; color: #38bdf8;">
+                        <div class="invoice-number">Nro. <span id="auth-id" style="color: #38bdf8; font-weight: 800;">00000-00014873</span></div>
+                        <div class="invoice-date">Fecha: <span id="auth-date-val" style="color: #f8fafc; font-weight: 600;">17/09/2023</span></div>
+                        <div id="auth-header-oc-container" style="font-size: 10px; font-weight: 800; margin-top: 3px; background: rgba(56, 189, 248, 0.15); padding: 2px 6px; border-radius: 4px; border: 1px dashed #38bdf8; color: #38bdf8;">
                             Orden de Compra: <span id="auth-header-nro-oc-val" style="color: #38bdf8; font-weight: 800;">-</span>
                         </div>
-                        <div style="font-size: 9.5px; margin-top: 4px; color: var(--text-muted); line-height: 1.3;">
-                            C.U.I.T.: <span style="color: #ffffff;">30-00000000-0</span><br>
-                            I.I.B.B.: <span style="color: #ffffff;">000-000000-0</span><br>
-                            Fecha Inicio Actividades: <span style="color: #ffffff;">01/01/2020</span>
+                        <div style="font-size: 9.5px; margin-top: 4px; color: #94a3b8; line-height: 1.3;">
+                            C.U.I.T.: <span style="color: #f8fafc; font-weight: 600;">30-00000000-0</span><br>
+                            I.I.B.B.: <span style="color: #f8fafc; font-weight: 600;">000-000000-0</span><br>
+                            Fecha Inicio Actividades: <span style="color: #f8fafc; font-weight: 600;">01/01/2020</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Ficha Identificación de la Oferta / Propuesta Técnica -->
-                <div id="auth-mecanico-header-box" style="display: none; margin-bottom: 12px; background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; overflow: hidden; font-size: 12px; color: var(--text-main); text-align: left; box-shadow: var(--glass-shadow);">
-                    <div style="background: rgba(6, 182, 212, 0.15); color: #22d3ee; font-weight: 800; font-size: 13px; padding: 10px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; gap: 8px;">
-                        <span style="background: #0891b2; color: white; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 800;">1</span>
-                        <span style="letter-spacing: 0.5px; font-weight: 800; text-decoration: underline;">IDENTIFICACIÓN DE LA OFERTA</span>
+                <!-- Ficha Cliente y Datos de la Orden (Formato Oficial PRESEA) -->
+                <div id="auth-mecanico-header-box" style="display: block; margin-bottom: 12px; background: rgba(15, 23, 42, 0.35); backdrop-filter: blur(2px); border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 6px; overflow: hidden; font-size: 11.5px; color: #f8fafc; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.25);">
+                    <!-- Fila 1: Cliente | Código -->
+                    <div style="display: flex; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding: 6px 12px; align-items: center; justify-content: space-between;">
+                        <div style="flex: 1.5; display: flex; align-items: center; gap: 8px;">
+                            <span style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); padding: 2px 8px; border-radius: 4px; font-weight: 800; font-size: 11px;">Cliente:</span>
+                            <span id="auth-meca-cliente-val" style="font-weight: 800; color: #ffffff; text-transform: uppercase;">-</span>
+                        </div>
+                        <div style="flex: 1; display: flex; align-items: center; gap: 8px;">
+                            <span style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); padding: 2px 8px; border-radius: 4px; font-weight: 800; font-size: 11px;">Código:</span>
+                            <span id="auth-meca-cliente-codigo-val" style="font-weight: 800; color: #38bdf8; font-family: monospace;">-</span>
+                        </div>
                     </div>
                     
-                    <div style="padding: 12px; display: flex; flex-direction: column; gap: 8px;">
-                        <div style="display: grid; grid-template-columns: 240px 1fr; gap: 8px; align-items: center;">
-                            <span style="font-style: italic; font-weight: 700; color: rgba(255,255,255,0.75);">i. Denominación del Servicio:</span>
-                            <span id="auth-meca-denominacion-val" style="font-weight: 700; color: #ffffff;">-</span>
+                    <!-- Fila 2: Domicilio | Localidad -->
+                    <div style="display: flex; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding: 6px 12px; align-items: center; justify-content: space-between;">
+                        <div style="flex: 1.5; display: flex; align-items: center; gap: 8px;">
+                            <span style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); padding: 2px 8px; border-radius: 4px; font-weight: 800; font-size: 11px;">Domicilio:</span>
+                            <span id="auth-meca-domicilio-val" style="font-weight: 700; color: #f8fafc; text-transform: uppercase;">-</span>
                         </div>
-                        <div style="display: grid; grid-template-columns: 240px 1fr; gap: 8px; align-items: center;">
-                            <span style="font-style: italic; font-weight: 700; color: rgba(255,255,255,0.75);">ii. Cliente:</span>
-                            <span id="auth-meca-cliente-val" style="font-weight: 700; color: #ffffff;">CARGILL SACI</span>
+                        <div style="flex: 1; display: flex; align-items: center; gap: 8px;">
+                            <span style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); padding: 2px 8px; border-radius: 4px; font-weight: 800; font-size: 11px;">Localidad:</span>
+                            <span id="auth-meca-localidad-val" style="font-weight: 700; color: #f8fafc; text-transform: uppercase;">-</span>
                         </div>
-                        <div style="display: grid; grid-template-columns: 240px 1fr; gap: 8px; align-items: center;">
-                            <span style="font-style: italic; font-weight: 700; color: rgba(255,255,255,0.75);">iii. Nombre del Proveedor:</span>
-                            <span id="auth-meca-proveedor-val" style="font-weight: 700; color: #ffffff;">SG MONTAJES SRL</span>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 240px 1fr; gap: 8px; align-items: center; background: rgba(234, 179, 8, 0.12); padding: 4px 8px; border-radius: 6px;">
-                            <span style="font-style: italic; font-weight: 700; color: #fde047;">iv. Fecha de Oferta:</span>
-                            <span id="auth-meca-oferta-val" style="font-weight: 800; color: #fde047;">-</span>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 240px 1fr; gap: 8px; align-items: center;">
-                            <span style="font-style: italic; font-weight: 700; color: rgba(255,255,255,0.75);">v. Validez de la Oferta:</span>
-                            <span id="auth-meca-validez-val" style="font-weight: 700; color: #ffffff;">5 días</span>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 240px 1fr; gap: 8px; align-items: center;">
-                            <span style="font-style: italic; font-weight: 700; color: rgba(255,255,255,0.75);">vi. Planta:</span>
-                            <span id="auth-meca-planta-val" style="font-weight: 700; color: #ffffff;">APS</span>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 240px 1fr; gap: 8px; align-items: center;">
-                            <span id="lbl-auth-meca-inicio" style="font-style: italic; font-weight: 700; color: rgba(255,255,255,0.75);">vii. Fecha estimada de Inicio:</span>
-                            <span id="auth-meca-inicio-val" style="font-weight: 700; color: #ffffff;">-</span>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 240px 1fr; gap: 8px; align-items: center;">
-                            <span id="lbl-auth-meca-duracion" style="font-style: italic; font-weight: 700; color: rgba(255,255,255,0.75);">viii. Duración estimada de la Ejecución:</span>
-                            <span id="auth-meca-duracion-val" style="font-weight: 700; color: #ffffff;">-</span>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 240px 1fr; gap: 8px; align-items: center; background: rgba(234, 179, 8, 0.12); padding: 4px 8px; border-radius: 6px;">
-                            <span id="lbl-auth-meca-fin" style="font-style: italic; font-weight: 700; color: #fde047;">ix. Plazo Máximo de Finalización:</span>
-                            <span id="auth-meca-fin-val" style="font-weight: 800; color: #fde047;">-</span>
-                        </div>
+                    </div>
 
-                        <!-- 2. PROPUESTA TÉCNICA -->
-                        <div id="auth-meca-propuesta-box" style="border-top: 1px solid rgba(255, 255, 255, 0.08); margin-top: 6px; padding-top: 8px; display: flex; flex-direction: column; gap: 6px;">
-                            <div style="font-weight: 800; color: #22d3ee; margin-bottom: 2px;">2. PROPUESTA TÉCNICA (DESCRIPCIÓN)</div>
-                            <div><strong style="color: rgba(255,255,255,0.75);">DETALLAR PROPUESTA:</strong> <span id="auth-meca-propuesta-val" style="color: #ffffff;">-</span></div>
-                            <div><strong style="color: rgba(255,255,255,0.75);">CANT DE PERSONAL DESTINADO:</strong> <span id="auth-meca-personal-val" style="color: #ffffff;">-</span></div>
-                            <div><strong style="color: rgba(255,255,255,0.75);">INDICAR EXCLUSIONES:</strong> <span id="auth-meca-exclusiones-val" style="color: #ffffff;">-</span></div>
+                    <!-- Fila 3: C.U.I.T. | Fecha de Entrega -->
+                    <div style="display: flex; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding: 6px 12px; align-items: center; justify-content: space-between;">
+                        <div style="flex: 1.5; display: flex; align-items: center; gap: 8px;">
+                            <span style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); padding: 2px 8px; border-radius: 4px; font-weight: 800; font-size: 11px;">C.U.I.T.:</span>
+                            <span id="auth-meca-cuit-val" style="font-weight: 700; color: #38bdf8; font-family: monospace;">-</span>
+                        </div>
+                        <div style="flex: 1; display: flex; align-items: center; gap: 8px;">
+                            <span style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); padding: 2px 8px; border-radius: 4px; font-weight: 800; font-size: 11px;">Fecha de Entrega:</span>
+                            <span id="auth-meca-entrega-val" style="font-weight: 700; color: #38bdf8; font-family: monospace;">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Fila 4: Condición de venta | Nro Presupuesto -->
+                    <div style="display: flex; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding: 6px 12px; align-items: center; justify-content: space-between;">
+                        <div style="flex: 1.5; display: flex; align-items: center; gap: 8px;">
+                            <span style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); padding: 2px 8px; border-radius: 4px; font-weight: 800; font-size: 11px;">Condición de venta:</span>
+                            <span id="auth-meca-condicion-val" style="font-weight: 700; color: #f8fafc; text-transform: uppercase;">-</span>
+                        </div>
+                        <div style="flex: 1; display: flex; align-items: center; gap: 8px;">
+                            <span style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); padding: 2px 8px; border-radius: 4px; font-weight: 800; font-size: 11px;">Nro Presupuesto:</span>
+                            <span id="auth-meca-nro-presupuesto-val" style="font-weight: 800; color: #38bdf8; font-family: monospace;">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Fila 5: Fabricado en Planta -->
+                    <div style="display: flex; padding: 6px 12px; align-items: center; justify-content: space-between;">
+                        <div style="flex: 1.5; display: flex; align-items: center; gap: 8px;">
+                            <span style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); padding: 2px 8px; border-radius: 4px; font-weight: 800; font-size: 11px;">Fabricado en Planta:</span>
+                            <span id="auth-meca-planta-val" style="font-weight: 700; color: #f8fafc;">VGG</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Contenedor del Tarifario / Propuesta Comercial con Pestañas (Paso 2: Ubicado después del Paso 1) -->
-                <div id="auth-mecanico-excel-container" style="display: none; margin-bottom: 12px;"></div>
-
-                <!-- Ficha del Cliente (Customer Info Box) -->
-                <div class="customer-info-box" id="auth-customer-info-box">
-                    <div class="info-row">
-                        <div class="info-cell cell-100"><strong>Cliente:</strong> <span id="auth-client-display">-</span></div>
-                    </div>
-                    <div class="info-row border-top">
-                        <div class="info-cell cell-60"><strong>Domicilio:</strong> <span id="auth-domicilio-val">-</span></div>
-                        <div class="info-cell cell-40 border-left"><strong>Localidad:</strong> <span id="auth-localidad-val">-</span></div>
-                    </div>
-                    <div class="info-row border-top">
-                        <div class="info-cell cell-60"><strong>Cond. I.V.A.:</strong> <span id="auth-iva-val">CONSUMIDOR FINAL</span></div>
-                        <div class="info-cell cell-40 border-left"><strong>C.U.I.T.:</strong> <span id="auth-cuit-val">-</span></div>
-                    </div>
-                    <div class="info-row border-top">
-                        <div class="info-cell cell-33"><strong>Condición de venta:</strong> <span id="auth-condition-container">-</span></div>
-                        <div class="info-cell cell-33 border-left"><strong>Depósito:</strong> <span id="auth-deposit-container">-</span></div>
-                        <div class="info-cell cell-34 border-left"><strong>Transporte:</strong> <span id="auth-transport-container">-</span></div>
-                    </div>
-                    <div class="info-row border-top bg-light">
-                        <div class="info-cell cell-33"><strong>Moneda:</strong> <span id="auth-currency-container">-</span></div>
-                        <div class="info-cell cell-33 border-left"><strong>Cargado Por:</strong> <span id="auth-user-val">-</span></div>
-                        <div class="info-cell cell-34 border-left"><strong>Control SLA:</strong> <span id="auth-sla-val">-</span></div>
-                    </div>
-                    <div class="info-row border-top">
-                        <div class="info-cell cell-50"><strong>Entrega:</strong> <span id="auth-entrega-val">-</span></div>
-                        <div class="info-cell cell-50 border-left"><strong>Forma Pago:</strong> <span id="auth-pago-val">-</span></div>
-                    </div>
-                </div>
+                <!-- Contenedor del Tarifario / Propuesta Comercial con Pestañas -->
+                <div id="auth-mecanico-excel-container" style="display: block; margin-bottom: 12px;"></div>
 
                 <!-- Desglose de Artículos (Grilla Oficial) -->
                 <div id="auth-items-panel" style="display: none; margin-bottom: 15px;">
@@ -1372,7 +1380,7 @@
                 </div>
 
                 <!-- Bloque Inferior: Observaciones, Facturas Pendientes y Totales -->
-                <div class="invoice-bottom-layout">
+                <div class="invoice-bottom-layout" id="auth-legacy-bottom-layout" style="display: none;">
                     <!-- Izquierda: Observaciones y Detalle de Facturas Pendientes -->
                     <div class="bottom-left-panel">
                         <div class="observations-box-v2">
@@ -1410,31 +1418,31 @@
                 </div>
 
                 <!-- Banner Informativo de Precios -->
-                <div style="border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; padding: 8px; text-align: center; font-weight: 800; font-size: 11px; margin-top: 10px; margin-bottom: 8px; color: var(--text-muted); background: rgba(30, 41, 59, 0.4); letter-spacing: 0.5px;">
+                <div style="border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 6px; padding: 7px 12px; text-align: center; font-weight: 800; font-size: 11px; margin-top: 10px; margin-bottom: 8px; color: #94a3b8; background: rgba(15, 23, 42, 0.35); letter-spacing: 0.5px;">
                     PRECIOS DEL PRESUPUESTO, SUJETOS A MODIFICACIONES SIN PREVIO AVISO
                 </div>
 
                 <!-- Aclaraciones & Condiciones Oficiales de Presupuesto Mecánico -->
-                <div id="auth-mecanico-aclaraciones" style="display: none; margin-top: 10px; margin-bottom: 10px; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 10px; font-size: 11px; color: var(--text-main); text-align: left; background: rgba(30, 41, 59, 0.4);">
-                    <div style="color: #f43f5e; font-weight: bold; font-size: 12px; margin-bottom: 6px;">
+                <div id="auth-mecanico-aclaraciones" style="display: none; margin-top: 10px; margin-bottom: 10px; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 6px; padding: 10px; font-size: 11px; color: #f8fafc; text-align: left; background: rgba(15, 23, 42, 0.35); backdrop-filter: blur(2px);">
+                    <div style="color: #f87171; font-weight: bold; font-size: 12px; margin-bottom: 6px;">
                         ⚠️ Aclaraciones: LAS HORAS DE EMERGENCIA SE CONTEMPLAN 5 HORAS NORMALES.
                     </div>
-                    <div style="line-height: 1.6; color: var(--text-main);">
-                        <div><strong style="color: rgba(255,255,255,0.75);">i. Garantía Requerida:</strong> 6 MESES</div>
-                        <div><strong style="color: rgba(255,255,255,0.75);">ii. Convenio:</strong> La Mano de Obra contempla el Convenio UOCRA vigente. Los trabajos en planta contemplan el convenio Agroexportador.</div>
-                        <div><strong style="color: rgba(255,255,255,0.75);">iii. Forma de Pago:</strong> 30 días fecha de factura</div>
+                    <div style="line-height: 1.6; color: #cbd5e1;">
+                        <div><strong style="color: #ffffff;">i. Garantía Requerida:</strong> 6 MESES</div>
+                        <div><strong style="color: #ffffff;">ii. Convenio:</strong> La Mano de Obra contempla el Convenio UOCRA vigente. Los trabajos en planta contemplan el convenio Agroexportador.</div>
+                        <div><strong style="color: #ffffff;">iii. Forma de Pago:</strong> 30 días fecha de factura</div>
                     </div>
                 </div>
 
                 <!-- Footer de Equivalencia y Entrega -->
-                <div class="invoice-footer-info">
-                    <div class="footer-info-left">
-                        <div class="system-footer-line" style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">
-                            Presea &nbsp;&nbsp; Usuario:<span id="auth-sys-user" style="color: #fff;">1</span> &nbsp;&nbsp; Fecha:<span id="auth-sys-date" style="color: #fff;">-</span> &nbsp;&nbsp; Item: <span id="auth-sys-items-count" style="color: #fff;">0</span> &nbsp;&nbsp; Reporte: PRESUPUE_GR &nbsp;&nbsp; Página: 1
+                <div class="invoice-footer-info" style="display: flex; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 6px; margin-top: 8px; margin-bottom: 8px; background: rgba(15, 23, 42, 0.35); backdrop-filter: blur(2px); overflow: hidden; color: #cbd5e1;">
+                    <div class="footer-info-left" style="flex: 1.5; border-right: 1px solid rgba(255, 255, 255, 0.14); display: flex; flex-direction: column; justify-content: space-between;">
+                        <div class="system-footer-line" style="font-size: 10px; color: #94a3b8; padding: 5px 8px; background: transparent;">
+                            Presea &nbsp;&nbsp; Usuario:<span id="auth-sys-user" style="color: #ffffff; font-weight: 700;">1</span> &nbsp;&nbsp; Fecha:<span id="auth-sys-date" style="color: #ffffff; font-weight: 700;">-</span> &nbsp;&nbsp; Item: <span id="auth-sys-items-count" style="color: #ffffff; font-weight: 700;">0</span> &nbsp;&nbsp; Reporte: <span id="auth-sys-report-name" style="color: #ffffff; font-weight: 700;">Presupuesto</span> &nbsp;&nbsp; Página: 1
                         </div>
                     </div>
-                    <div class="footer-info-right">
-                        <div class="cai-details">
+                    <div class="footer-info-right" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div class="cai-details" style="padding: 5px 8px; font-size: 9px; text-align: right; font-weight: bold; background: transparent; color: #cbd5e1;">
                             Nro C.A.I.: <span id="auth-cai-val">0</span> &nbsp;&nbsp; Vto: <span id="auth-cai-vto">/ /</span>
                         </div>
                     </div>
@@ -1478,94 +1486,212 @@
                     </button>
                 </div>
             </div>
+
+            <!-- Barra Inferior de Navegación -->
+            <div style="margin-top: 20px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                <button type="button" class="btn btn-sm" onclick="volverAccionAnterior()" style="font-family: inherit; font-size: 12px; font-weight: 700; height: 34px; padding: 0 14px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #38bdf8; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+                    <i class="fa-solid fa-arrow-left"></i> Volver
+                </button>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="closeModal()" style="font-size: 12px; font-weight: 700; height: 34px; padding: 0 14px; border-radius: 6px;">
+                    Cerrar ✕
+                </button>
+            </div>
         </div>
     </template>
 
-    <!-- Template: Análisis de Presupuestos (Métricas y Rendimiento) -->
+    <!-- Template: Análisis de Presupuestos y Business Intelligence (BI) -->
     <template id="tpl-metrics">
-        <div class="view-header">
-            <h3>📊 Análisis de Presupuestos</h3>
-            <p>Monitoreo en tiempo real del volumen comercial facturado y retenido.</p>
+        <div class="view-header" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+            <div>
+                <h3 style="margin: 0; color: white; display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 800;">
+                    <span style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(56, 189, 248, 0.3); font-size: 16px;">📊 BI</span>
+                    Estadísticas Comerciales y Financieras
+                </h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin: 5px 0 0 0;">Análisis en tiempo real de cotizaciones, avances de obra certificados y rendimiento comercial.</p>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <button type="button" class="btn btn-sm" onclick="descargarReporteEstadisticasCSV()" style="background: #10b981; color: white; font-weight: 700; border: none; padding: 8px 14px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;" title="Descargar planilla CSV para Excel">
+                    <i class="fas fa-file-excel"></i> Exportar CSV / Excel
+                </button>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="imprimirReporteEstadisticas()" style="font-weight: 700; padding: 8px 14px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+                    <i class="fas fa-print"></i> Imprimir Reporte
+                </button>
+            </div>
         </div>
         
-        <!-- Filtros de Métricas -->
-        <div class="glass-card" style="margin-bottom: 20px; display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
-            <div class="form-group" style="margin-bottom: 0; min-width: 150px;">
-                <label>Fecha Inicio</label>
-                <input type="date" id="filter-date-start" style="height: 42px; box-sizing: border-box;" title="Clic derecho para filtros rápidos (Hoy, Ayer, etc.)">
+        <!-- Filtros Interactivos -->
+        <div class="glass-card" style="margin-bottom: 20px; display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap; padding: 15px 20px;">
+            <div class="form-group" style="margin-bottom: 0; min-width: 140px;">
+                <label style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Desde</label>
+                <input type="date" id="filter-date-start" style="height: 38px; box-sizing: border-box; background: rgba(15, 23, 42, 0.7); color: white; border: 1px solid var(--glass-border); border-radius: 6px; padding: 0 10px;">
             </div>
-            <div class="form-group" style="margin-bottom: 0; min-width: 150px;">
-                <label>Fecha Fin</label>
-                <input type="date" id="filter-date-end" style="height: 42px; box-sizing: border-box;" title="Clic derecho para filtros rápidos (Hoy, Ayer, etc.)">
+            <div class="form-group" style="margin-bottom: 0; min-width: 140px;">
+                <label style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Hasta</label>
+                <input type="date" id="filter-date-end" style="height: 38px; box-sizing: border-box; background: rgba(15, 23, 42, 0.7); color: white; border: 1px solid var(--glass-border); border-radius: 6px; padding: 0 10px;">
             </div>
-            <div class="form-group" style="margin-bottom: 0; min-width: 200px;">
-                <label>Vendedor</label>
-                <select id="filter-metrics-seller" style="height: 42px; box-sizing: border-box; background: rgba(30, 41, 59, 0.6); color: white; border: 1px solid var(--glass-border); border-radius: 6px; padding: 0 10px; width: 100%;">
-                    <option value="">Todos los Vendedores...</option>
+            <div class="form-group" style="margin-bottom: 0; min-width: 160px;">
+                <label style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Rubro</label>
+                <select id="filter-metrics-rubro" style="height: 38px; box-sizing: border-box; background: rgba(15, 23, 42, 0.7); color: white; border: 1px solid var(--glass-border); border-radius: 6px; padding: 0 10px; width: 100%;">
+                    <option value="">Todos los Rubros</option>
+                    <option value="Eléctrico">⚡ Eléctrico</option>
+                    <option value="Mecánico">⚙️ Mecánico</option>
                 </select>
             </div>
-            <button id="btn-apply-filters" class="btn btn-primary" style="height: 42px;">Filtrar</button>
-            <button id="btn-clear-filters" class="btn btn-outline" style="height: 42px;">Limpiar</button>
+            <div class="form-group" style="margin-bottom: 0; min-width: 180px;">
+                <label style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Usuario / Operador</label>
+                <select id="filter-metrics-seller" style="height: 38px; box-sizing: border-box; background: rgba(15, 23, 42, 0.7); color: white; border: 1px solid var(--glass-border); border-radius: 6px; padding: 0 10px; width: 100%;">
+                    <option value="">Todos los Usuarios...</option>
+                </select>
+            </div>
+            <button id="btn-apply-filters" class="btn btn-primary" style="height: 38px; padding: 0 18px; font-weight: 700;">Filtrar</button>
+            <button id="btn-clear-filters" class="btn btn-outline" style="height: 38px; padding: 0 14px;">Limpiar</button>
         </div>
 
-        <!-- Tarjetas de Métricas -->
-        <div class="metrics-grid" style="margin-bottom: 24px;">
-            <div class="glass-card metric-card" onclick="abrirModalMetricaVendedor('total')" title="Haga clic para ver desglose por vendedor">
-                <h5>Pedidos Ingresados</h5>
-                <div class="metric-value" id="metric-total">0</div>
-                <div style="font-size: 14px; color: var(--text-muted); margin-top: 5px;">Monto Total: <strong id="metric-total-amt">$0.00</strong></div>
-            </div>
-            <div class="glass-card metric-card" onclick="abrirModalMetricaVendedor('approved')" title="Haga clic para ver desglose por vendedor">
-                <h5>Pedidos Autorizados / Aprobados</h5>
-                <div class="metric-value text-success" id="metric-approved" style="color: var(--success);">0</div>
-                <div style="font-size: 14px; color: var(--text-muted); margin-top: 5px;">Monto: <strong id="metric-approved-amt">$0.00</strong></div>
-            </div>
-            <div class="glass-card metric-card" onclick="abrirModalMetricaVendedor('pending')" title="Haga clic para ver desglose por vendedor">
-                <h5>Pendientes de Autorización</h5>
-                <div class="metric-value text-warning" id="metric-pending" style="color: var(--primary);">0</div>
-                <div style="font-size: 14px; color: var(--text-muted); margin-top: 5px;">Monto: <strong id="metric-pending-amt">$0.00</strong></div>
-            </div>
-            <div class="glass-card metric-card" onclick="abrirModalMetricaVendedor('rejected')" title="Haga clic para ver desglose por vendedor">
-                <h5>Pedidos Rechazados</h5>
-                <div class="metric-value text-danger" id="metric-rejected" style="color: var(--danger);">0</div>
-                <div style="font-size: 14px; color: var(--text-muted); margin-top: 5px;">Monto: <strong id="metric-rejected-amt">$0.00</strong></div>
+        <!-- UN SOLO RECUADRO UNIFICADO DE MÉTRICAS Y KPIS -->
+        <div class="glass-card" style="margin-bottom: 24px; padding: 0; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; background: rgba(15, 23, 42, 0.65); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
+                
+                <!-- KPI 1: Total Presupuestado -->
+                <div style="padding: 18px 22px; border-right: 1px solid rgba(255,255,255,0.08); border-bottom: 1px solid rgba(255,255,255,0.08);">
+                    <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">TOTAL PRESUPUESTADO</div>
+                    <div id="metric-total-amt" style="font-size: 22px; font-weight: 800; color: #38bdf8; font-family: inherit; letter-spacing: -0.5px;">$0,00</div>
+                    <div style="font-size: 12px; color: #94a3b8; margin-top: 5px; font-family: inherit;"><span id="metric-total" style="font-weight: 700; color: white;">0</span> presupuestos cotizados</div>
+                </div>
+
+                <!-- KPI 2: Total Facturado (Avances) -->
+                <div style="padding: 18px 22px; border-right: 1px solid rgba(255,255,255,0.08); border-bottom: 1px solid rgba(255,255,255,0.08);">
+                    <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">TOTAL FACTURADO (AVANCES)</div>
+                    <div id="metric-facturado-amt" style="font-size: 22px; font-weight: 800; color: #34d399; font-family: inherit; letter-spacing: -0.5px;">$0,00</div>
+                    <div style="font-size: 12px; color: #94a3b8; margin-top: 5px; font-family: inherit;"><span id="metric-pct-facturado-global" style="font-weight: 700; color: #34d399;">0%</span> del total cotizado</div>
+                </div>
+
+                <!-- KPI 3: Saldo Pendiente de Cobro -->
+                <div style="padding: 18px 22px; border-right: 1px solid rgba(255,255,255,0.08); border-bottom: 1px solid rgba(255,255,255,0.08);">
+                    <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">SALDO PENDIENTE DE COBRO</div>
+                    <div id="metric-pendiente-cobro-amt" style="font-size: 22px; font-weight: 800; color: #fde047; font-family: inherit; letter-spacing: -0.5px;">$0,00</div>
+                    <div style="font-size: 12px; color: #94a3b8; margin-top: 5px; font-family: inherit;">Por certificar / finalizar obra</div>
+                </div>
+
+                <!-- KPI 4: Aprobados con OC -->
+                <div style="padding: 18px 22px; border-right: 1px solid rgba(255,255,255,0.08); border-bottom: 1px solid rgba(255,255,255,0.08);">
+                    <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">APROBADOS CON OC</div>
+                    <div id="metric-approved-amt" style="font-size: 22px; font-weight: 800; color: #a78bfa; font-family: inherit; letter-spacing: -0.5px;">$0,00</div>
+                    <div style="font-size: 12px; color: #94a3b8; margin-top: 5px; font-family: inherit;"><span id="metric-approved" style="font-weight: 700; color: white;">0</span> órdenes aprobadas</div>
+                </div>
+
+                <!-- KPI 5: Rubro Eléctrico -->
+                <div style="padding: 18px 22px; border-right: 1px solid rgba(255,255,255,0.08); border-bottom: 1px solid rgba(255,255,255,0.08);">
+                    <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">⚡ RUBRO ELÉCTRICO</div>
+                    <div id="metric-elec-amt" style="font-size: 22px; font-weight: 800; color: #facc15; font-family: inherit; letter-spacing: -0.5px;">$0,00</div>
+                    <div style="font-size: 12px; color: #94a3b8; margin-top: 5px; font-family: inherit;"><span id="metric-elec-cnt" style="font-weight: 700; color: white;">0</span> cotizaciones</div>
+                </div>
+
+                <!-- KPI 6: Rubro Mecánico -->
+                <div style="padding: 18px 22px; border-right: 1px solid rgba(255,255,255,0.08); border-bottom: 1px solid rgba(255,255,255,0.08);">
+                    <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">⚙️ RUBRO MECÁNICO</div>
+                    <div id="metric-meca-amt" style="font-size: 22px; font-weight: 800; color: #22d3ee; font-family: inherit; letter-spacing: -0.5px;">$0,00</div>
+                    <div style="font-size: 12px; color: #94a3b8; margin-top: 5px; font-family: inherit;"><span id="metric-meca-cnt" style="font-weight: 700; color: white;">0</span> cotizaciones</div>
+                </div>
+
+                <!-- KPI 7: Facturado en el Mes -->
+                <div style="padding: 18px 22px; border-right: 1px solid rgba(255,255,255,0.08); border-bottom: 1px solid rgba(255,255,255,0.08);">
+                    <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">📅 FACTURADO EN EL MES</div>
+                    <div id="metric-facturado-mes-amt" style="font-size: 22px; font-weight: 800; color: #34d399; font-family: inherit; letter-spacing: -0.5px;">$0,00</div>
+                    <div style="font-size: 12px; color: #94a3b8; margin-top: 5px; font-family: inherit;"><span id="metric-facturado-mes-sub" style="font-weight: 700; color: #34d399;">Mes actual</span></div>
+                </div>
+
+                <!-- KPI 8: Facturado en el Año -->
+                <div style="padding: 18px 22px; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                    <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">📈 FACTURADO EN EL AÑO</div>
+                    <div id="metric-facturado-anio-amt" style="font-size: 22px; font-weight: 800; color: #38bdf8; font-family: inherit; letter-spacing: -0.5px;">$0,00</div>
+                    <div style="font-size: 12px; color: #94a3b8; margin-top: 5px; font-family: inherit;"><span id="metric-facturado-anio-sub" style="font-weight: 700; color: #38bdf8;">Año en curso</span></div>
+                </div>
+
             </div>
         </div>
 
-        <!-- Gráficos -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
-            <div class="glass-card">
-                <h5 style="text-align: center; margin-bottom: 15px;">Distribución de Pedidos (Cantidades)</h5>
-                <div style="position: relative; height: 300px; width: 100%;">
+        <!-- 4 Gráficos Interactivos -->
+        <div class="metrics-charts-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+            <div class="glass-card" style="padding: 20px;">
+                <h5 style="margin: 0 0 15px 0; color: white; font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-chart-pie" style="color: #38bdf8;"></i> Distribución por Estado Comercial (Cantidades)
+                </h5>
+                <div style="position: relative; height: 260px; width: 100%;">
                     <canvas id="chartStatusPie"></canvas>
                 </div>
             </div>
-            <div class="glass-card">
-                <h5 style="text-align: center; margin-bottom: 15px;">Monto Comercial por Estado ($)</h5>
-                <div style="position: relative; height: 300px; width: 100%;">
+
+            <div class="glass-card" style="padding: 20px;">
+                <h5 style="margin: 0 0 15px 0; color: white; font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-chart-bar" style="color: #34d399;"></i> Monto Total vs Facturado por Estado ($)
+                </h5>
+                <div style="position: relative; height: 260px; width: 100%;">
                     <canvas id="chartAmountBar"></canvas>
+                </div>
+            </div>
+
+            <div class="glass-card" style="padding: 20px;">
+                <h5 style="margin: 0 0 15px 0; color: white; font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-building" style="color: #fde047;"></i> Top 5 Clientes por Volumen Cotizado ($)
+                </h5>
+                <div style="position: relative; height: 260px; width: 100%;">
+                    <canvas id="chartTopClientes"></canvas>
+                </div>
+            </div>
+
+            <div class="glass-card" style="padding: 20px;">
+                <h5 style="margin: 0 0 15px 0; color: white; font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-bolt" style="color: #f59e0b;"></i> Mix de Facturación por Rubro (Eléctrico vs Mecánico)
+                </h5>
+                <div style="position: relative; height: 260px; width: 100%;">
+                    <canvas id="chartRubroMix"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- Rendimiento por Vendedor -->
-        <div class="glass-card" style="margin-bottom: 24px;">
-            <h5 style="text-align: left; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; color: var(--primary);">
-                <i class="fa-solid fa-user-tie"></i> Rendimiento por Vendedor
+        <!-- Tabla: Rendimiento por Usuario / Operador -->
+        <div class="glass-card" style="margin-bottom: 24px; padding: 20px;">
+            <h5 style="text-align: left; margin: 0 0 15px 0; display: flex; align-items: center; gap: 8px; color: #38bdf8; font-size: 15px; font-weight: 800;">
+                <i class="fa-solid fa-users-gear"></i> Rendimiento por Usuario / Operador
             </h5>
             <div class="table-responsive">
-                <table class="data-table">
+                <table class="data-table" style="width: 100%;">
                     <thead>
-                        <tr>
-                            <th>Vendedor</th>
-                            <th style="text-align: right;">Pedidos Aprobados</th>
-                            <th style="text-align: right;">Monto Aprobado ($)</th>
-                            <th style="text-align: right;">Pedidos Totales</th>
-                            <th style="text-align: right;">Monto Total ($)</th>
+                        <tr style="background: rgba(15, 23, 42, 0.7);">
+                            <th>Usuario / Operador</th>
+                            <th style="text-align: center;">Presupuestos Totales</th>
+                            <th style="text-align: center;">Aprobados con OC</th>
+                            <th style="text-align: right;">Total Cotizado ($)</th>
+                            <th style="text-align: right;">Total Facturado ($)</th>
+                            <th style="text-align: center;">% Efectividad</th>
                         </tr>
                     </thead>
                     <tbody id="seller-performance-list">
-                        <!-- Filas dinámicas por vendedor -->
+                        <!-- Filas dinámicas por usuario -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tabla: Top Clientes y Avances de Obra -->
+        <div class="glass-card" style="margin-bottom: 24px; padding: 20px;">
+            <h5 style="text-align: left; margin: 0 0 15px 0; display: flex; align-items: center; gap: 8px; color: #34d399; font-size: 15px; font-weight: 800;">
+                <i class="fa-solid fa-industry"></i> Resumen de Cuentas por Cliente
+            </h5>
+            <div class="table-responsive">
+                <table class="data-table" style="width: 100%;">
+                    <thead>
+                        <tr style="background: rgba(15, 23, 42, 0.7);">
+                            <th>Cliente</th>
+                            <th style="text-align: center;">Presupuestos</th>
+                            <th style="text-align: right;">Total Presupuestado ($)</th>
+                            <th style="text-align: center;">% Avance Promedio</th>
+                            <th style="text-align: right;">Total Facturado ($)</th>
+                            <th style="text-align: right;">Saldo Pendiente ($)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="client-performance-list">
+                        <!-- Filas dinámicas por cliente -->
                     </tbody>
                 </table>
             </div>
@@ -1890,9 +2016,9 @@
 
                 <div style="display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 15px; margin-bottom: 15px;">
                     <div class="form-group" style="margin-bottom: 0;">
-                        <label style="font-weight: bold; color: white;">% de Avance Actual *</label>
+                        <label style="font-weight: bold; color: white;">% de Avance Actual * <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">(Decimales con ",")</span></label>
                         <div style="position: relative;">
-                            <input type="number" id="avance-input-pct" min="1" max="100" step="1" placeholder="Ej: 30" style="font-size: 16px; font-weight: 800; color: #2dd4bf; padding-right: 30px;" oninput="onAvancePorcentajeInput(this.value)">
+                            <input type="text" id="avance-input-pct" inputmode="decimal" placeholder="Ej: 30 o 25,5" style="font-size: 16px; font-weight: 800; color: #2dd4bf; padding-right: 30px;" onkeydown="if(event.key==='.'){event.preventDefault(); if(!this.value.includes(',')){ const s=this.selectionStart, e=this.selectionEnd; this.value=this.value.substring(0,s)+','+this.value.substring(e); this.selectionStart=this.selectionEnd=s+1; onAvancePorcentajeInput(this.value); }}" oninput="onAvancePorcentajeInput(this.value)">
                             <span style="position: absolute; right: 12px; top: 10px; font-weight: 800; color: #2dd4bf;">%</span>
                         </div>
                     </div>
@@ -1949,6 +2075,16 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+
+            <!-- Barra Inferior con Botón Volver -->
+            <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                <button type="button" class="btn" onclick="volverAccionAnterior()" style="font-family: inherit; font-size: 13px; font-weight: 800; padding: 8px 20px; min-height: 38px; background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1.5px solid #38bdf8; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer;" title="Volver a la bandeja">
+                    <i class="fa-solid fa-arrow-left"></i> <span>⬅️ Volver a la Bandeja</span>
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal()" style="font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 6px;">
+                    Cerrar ✕
+                </button>
             </div>
         </div>
     </template>
@@ -2081,6 +2217,16 @@
                 </div>
 
             </div>
+
+            <!-- Barra Inferior con Botón Volver -->
+            <div class="no-print" style="margin-top: 15px; padding-top: 12px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+                <button type="button" class="btn" onclick="volverAccionAnterior()" style="font-family: inherit; font-size: 13px; font-weight: 700; padding: 8px 18px; background: #0284c7; color: white; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-arrow-left"></i> <span>Volver</span>
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal()" style="font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 6px; background: #e2e8f0; color: #334155;">
+                    Cerrar ✕
+                </button>
+            </div>
         </div>
     </template>
 
@@ -2131,20 +2277,165 @@
         </div>
     </template>
 
-    <!-- Script de bases de datos locales precargadas desde compilar_datos.py -->
-    <script src="condiciones_db.js?v=18"></script>
-    <script src="depositos_db.js?v=18"></script>
-    <script src="transportes_db.js?v=18"></script>
-    <script src="clientes_db.js?v=18"></script>
-    <script src="stock_db.js?v=18"></script>
-    <script src="vendedores_db.js?v=18"></script>
-    <script src="presupuestos_catalog_db.js?v=20"></script>
-    
-    <!-- Firebase SDK (compat mode) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <!-- CONTENEDOR EXCLUSIVO: REPORTE GERENCIAL IMPRESO (ESTADÍSTICAS Y BI) -->
+    <div id="printable-executive-report" class="reporte-ejecutivo-a4">
+        <!-- 1. ENCABEZADO CORPORATIVO OFICIAL -->
+        <div class="report-header">
+            <div class="report-header-left">
+                <img src="logo_sg_montajes.png" alt="SG Montajes" class="report-logo">
+                <div>
+                    <h1 class="report-company-name">SG MONTAJES S.R.L.</h1>
+                    <div class="report-company-sub">Ingeniería & Montajes Industriales • Obras Eléctricas y Mecánicas</div>
+                </div>
+            </div>
+            <div class="report-header-right">
+                <div class="report-doc-title">INFORME GERENCIAL Y FINANCIERO</div>
+                <div class="report-doc-subtitle">Estadísticas Comerciales y Rendimiento</div>
+                <div class="report-meta-item"><strong>Emisión:</strong> <span id="rep-emision-date">--</span></div>
+                <div class="report-meta-item"><strong>Período:</strong> <span id="rep-periodo">--</span></div>
+                <div class="report-meta-item"><strong>Filtro:</strong> <span id="rep-operador">--</span></div>
+            </div>
+        </div>
+
+        <!-- 2. RESUMEN EJECUTIVO CONSOLIDADO (KPIS GRANDES) -->
+        <div class="report-section-title">
+            <span class="report-section-badge">1</span>
+            <span>INDICADORES FINANCIEROS Y COMERCIALES CLAVE</span>
+        </div>
+        
+        <div class="report-kpi-grid">
+            <div class="report-kpi-box">
+                <div class="kpi-box-label">TOTAL PRESUPUESTADO</div>
+                <div class="kpi-box-value blue" id="rep-kpi-total-amt">$0,00</div>
+                <div class="kpi-box-sub"><span id="rep-kpi-total-cnt">0</span> cotizaciones emitidas</div>
+            </div>
+            <div class="report-kpi-box">
+                <div class="kpi-box-label">TOTAL FACTURADO (AVANCES)</div>
+                <div class="kpi-box-value green" id="rep-kpi-facturado-amt">$0,00</div>
+                <div class="kpi-box-sub"><span id="rep-kpi-facturado-pct">0%</span> del total cotizado</div>
+            </div>
+            <div class="report-kpi-box">
+                <div class="kpi-box-label">📅 FACTURADO EN EL MES</div>
+                <div class="kpi-box-value green" id="rep-kpi-facturado-mes-amt">$0,00</div>
+                <div class="kpi-box-sub"><span id="rep-kpi-facturado-mes-sub">Mes actual</span></div>
+            </div>
+            <div class="report-kpi-box">
+                <div class="kpi-box-label">📈 FACTURADO EN EL AÑO</div>
+                <div class="kpi-box-value blue" id="rep-kpi-facturado-anio-amt">$0,00</div>
+                <div class="kpi-box-sub"><span id="rep-kpi-facturado-anio-sub">Año actual</span></div>
+            </div>
+            <div class="report-kpi-box">
+                <div class="kpi-box-label">SALDO PENDIENTE DE COBRO</div>
+                <div class="kpi-box-value orange" id="rep-kpi-pendiente-amt">$0,00</div>
+                <div class="kpi-box-sub">Por certificar / cobrar</div>
+            </div>
+            <div class="report-kpi-box">
+                <div class="kpi-box-label">APROBADOS CON OC</div>
+                <div class="kpi-box-value purple" id="rep-kpi-approved-amt">$0,00</div>
+                <div class="kpi-box-sub"><span id="rep-kpi-approved-cnt">0</span> órdenes aprobadas</div>
+            </div>
+            <div class="report-kpi-box">
+                <div class="kpi-box-label">⚡ RUBRO ELÉCTRICO</div>
+                <div class="kpi-box-value gold" id="rep-kpi-elec-amt">$0,00</div>
+                <div class="kpi-box-sub"><span id="rep-kpi-elec-cnt">0</span> cotizaciones</div>
+            </div>
+            <div class="report-kpi-box">
+                <div class="kpi-box-label">⚙️ RUBRO MECÁNICO</div>
+                <div class="kpi-box-value cyan" id="rep-kpi-meca-amt">$0,00</div>
+                <div class="kpi-box-sub"><span id="rep-kpi-meca-cnt">0</span> cotizaciones</div>
+            </div>
+        </div>
+
+        <!-- 3. TABLA: RESUMEN FINANCIERO POR CLIENTE -->
+        <div class="report-section-title">
+            <span class="report-section-badge">2</span>
+            <span>RESUMEN FINANCIERO Y AVANCES POR CLIENTE</span>
+        </div>
+        
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th style="width: 32%;">Cliente</th>
+                    <th style="text-align: center; width: 10%;">Cotiz.</th>
+                    <th style="text-align: right; width: 18%;">Total Cotizado ($)</th>
+                    <th style="text-align: center; width: 12%;">% Avance</th>
+                    <th style="text-align: right; width: 14%;">Facturado ($)</th>
+                    <th style="text-align: right; width: 14%;">Saldo Pendiente ($)</th>
+                </tr>
+            </thead>
+            <tbody id="rep-table-clients-body">
+                <!-- Filas dinámicas -->
+            </tbody>
+            <tfoot id="rep-table-clients-foot">
+                <!-- Fila de totales consolidados -->
+            </tfoot>
+        </table>
+
+        <!-- 4. TABLA: RENDIMIENTO POR VENDEDOR / OPERADOR -->
+        <div class="report-section-title">
+            <span class="report-section-badge">3</span>
+            <span>RENDIMIENTO COMERCIAL POR VENDEDOR / OPERADOR</span>
+        </div>
+        
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th style="width: 30%;">Vendedor / Operador</th>
+                    <th style="text-align: center; width: 12%;">Cotizaciones</th>
+                    <th style="text-align: center; width: 12%;">Aprobadas OC</th>
+                    <th style="text-align: right; width: 18%;">Monto Cotizado ($)</th>
+                    <th style="text-align: right; width: 16%;">Monto Facturado ($)</th>
+                    <th style="text-align: center; width: 12%;">% Efectividad</th>
+                </tr>
+            </thead>
+            <tbody id="rep-table-sellers-body">
+                <!-- Filas dinámicas -->
+            </tbody>
+            <tfoot id="rep-table-sellers-foot">
+                <!-- Fila de totales consolidados -->
+            </tfoot>
+        </table>
+
+        <!-- 5. TABLA: DETALLE COMPLETO DE COTIZACIONES Y PRESUPUESTOS -->
+        <div class="report-section-title">
+            <span class="report-section-badge">4</span>
+            <span>DETALLE DE COTIZACIONES Y PRESUPUESTOS EMITIDOS</span>
+        </div>
+        
+        <table class="report-table report-table-detail">
+            <thead>
+                <tr>
+                    <th style="width: 6%;">N° ID</th>
+                    <th style="width: 8%;">Fecha</th>
+                    <th style="width: 8%;">Rubro</th>
+                    <th style="width: 20%;">Cliente</th>
+                    <th style="width: 18%;">Obra / Denominación</th>
+                    <th style="text-align: right; width: 12%;">Importe Total ($)</th>
+                    <th style="text-align: center; width: 10%;">Estado</th>
+                    <th style="text-align: center; width: 6%;">% Avance</th>
+                    <th style="text-align: right; width: 12%;">Facturado ($)</th>
+                </tr>
+            </thead>
+            <tbody id="rep-table-detail-body">
+                <!-- Filas dinámicas -->
+            </tbody>
+            <tfoot id="rep-table-detail-foot">
+                <!-- Fila de totales consolidados -->
+            </tfoot>
+        </table>
+
+        <!-- 6. PIE DE PÁGINA OFICIAL -->
+        <div class="report-footer">
+            <div>SG MONTAJES S.R.L. • Sistema Integrado de Presupuestos e Ingeniería</div>
+            <div>Documento confidencial gerencial</div>
+        </div>
+    </div>
+
+    <!-- Supabase JS Client v2 y Configuración (Única fuente de datos) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase_config.js?v=3"></script>
     
     <!-- Script principal de lógica de negocio -->
-    <script src="app.js?v=110"></script>
+    <script src="app.js?v=206"></script>
 </body>
 </html>

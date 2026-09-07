@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Manual de Usuario Exhaustivo - SG MONTAJES SRL</title>
+    <style>
+        @page { size: A4; margin: 15mm; }
+        body { font-family: "Segoe UI", Arial, sans-serif; color: #1e293b; line-height: 1.6; padding: 25px; background-color: #ffffff; }
+        .header-brand { display: flex; align-items: center; justify-content: space-between; border-bottom: 4px solid #0284c7; padding-bottom: 15px; margin-bottom: 25px; }
+        .logo-text { font-weight: 900; font-size: 26px; color: #0f172a; }
+        .logo-text span { color: #f59e0b; }
+        h1 { color: #0f172a; font-size: 22px; margin-top: 0; }
+        h2 { color: #0369a1; border-bottom: 2px solid #cbd5e1; padding-bottom: 6px; margin-top: 35px; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+        h3 { color: #0f172a; font-size: 13.5px; margin-top: 20px; font-weight: 700; }
+        p, li { font-size: 12px; color: #334155; text-align: justify; }
+        ul, ol { margin-top: 5px; margin-bottom: 10px; padding-left: 20px; }
+        .step-box { background: #f8fafc; border-left: 4px solid #0284c7; padding: 14px 18px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .alert-important { background: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; padding: 12px 18px; margin: 15px 0; border-radius: 6px; font-size: 12px; }
+        .alert-danger { background: #fef2f2; border: 1px solid #fecaca; border-left: 4px solid #ef4444; padding: 12px 18px; margin: 15px 0; border-radius: 6px; font-size: 12px; color: #991b1b; }
+        .alert-info { background: #f0f9ff; border: 1px solid #bae6fd; border-left: 4px solid #0284c7; padding: 12px 18px; margin: 15px 0; border-radius: 6px; font-size: 12px; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 15px 0; }
+        .kpi-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; text-align: center; }
+        .kpi-title { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; }
+        .kpi-val { font-size: 14px; font-weight: 800; color: #0f172a; margin-top: 4px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 11px; }
+        th { background: #0f172a; color: #ffffff; padding: 8px 10px; text-align: left; font-weight: 700; text-transform: uppercase; font-size: 10.5px; }
+        td { border-bottom: 1px solid #e2e8f0; padding: 8px 10px; vertical-align: top; }
+        tr:nth-child(even) { background-color: #f8fafc; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 9.5px; font-weight: 700; text-transform: uppercase; }
+        .badge-green { background: #d1fae5; color: #047857; border: 1px solid #6ee7b7; }
+        .badge-amber { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+        .badge-blue { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
+        .badge-red { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+        .badge-purple { background: #ede9fe; color: #6d28d9; border: 1px solid #ddd6fe; }
+        .footer-doc { margin-top: 50px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 15px; }
+        .screen-mock { background: #0f172a; color: #f8fafc; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 10.5px; margin: 15px 0; }
+    </style>
+</head>
+<body>
+
+    <div class="header-brand">
+        <div>
+            <div class="logo-text">SG <span>MONTAJES</span> SRL</div>
+            <div style="color: #0284c7; font-size: 12.5px; font-weight: 700; letter-spacing: 0.5px;">SISTEMA INTEGRAL DE GESTIÓN DE PRESUPUESTOS, AVANCES DE OBRA Y BI</div>
+        </div>
+        <div style="text-align: right;">
+            <span class="badge badge-blue">MANUAL DE USUARIO OFICIAL</span><br>
+            <span style="font-size: 11px; color: #64748b;">Versión 2.5 — Actualizada</span>
+        </div>
+    </div>
+
+    <h1>📘 Manual Operativo Exhaustivo de Usuario</h1>
+    <p>Este documento constituye la guía maestra oficial para el uso del sistema web de <strong>Gestión de Presupuestos, Cotizaciones Técnicas, Certificación de Avances de Obra, Control Estricto de Facturación, Reportes Gerenciales y Consulta de Stock</strong> de <strong>SG MONTAJES SRL</strong>.</p>
+
+    <h2>Capítulo 1: Acceso, Autenticación y Segregación de Rubros</h2>
+    <p>El sistema cuenta con un control de accesos por credenciales individuales con separación de áreas de trabajo:</p>
+    
+    <h3>1.1 Inicio de Sesión y Credenciales</h3>
+    <ol>
+        <li>Ingrese a la dirección web del sistema: <a href="https://gr-nota-de-venta.web.app" target="_blank">https://gr-nota-de-venta.web.app</a> o al servidor local habilitado.</li>
+        <li>Introduzca su <strong>Usuario</strong> y <strong>Contraseña</strong> personal.</li>
+        <li>El sistema identificará su rol (<em>Administrador</em> o <em>Solicitante</em>) y su rubro asignado por defecto (<em>Eléctrico</em> o <em>Mecánico</em>).</li>
+    </ol>
+
+    <h3>1.2 Segregación de Rubros Operativos y Codificación Oficial</h3>
+    <p>Para garantizar una gestión ordenada de las ofertas, el sistema utiliza series correlativas independientes:</p>
+    <ul>
+        <li><strong>⚡ Rubro Eléctrico:</strong> Genera presupuestos con la codificación oficial <code>102-ELEC-XXXX</code>. Especializado en montajes eléctricos industriales, bandejas portacables, cableados de potencia, tableros y horas hombre.</li>
+        <li><strong>⚙️ Rubro Mecánico:</strong> Genera presupuestos con la codificación oficial <code>101-MEC-XXXX</code>. Diseñado para montajes mecánicos pesados, estructuras metálicas, piping, cañerías, calderería y soldadura con ficha técnica integral.</li>
+    </ul>
+
+    <div class="alert-info">
+        <strong>💡 Conmutador Superior de Rubros:</strong><br>
+        Los usuarios autorizados pueden alternar instantáneamente entre la vista <strong>⚡ Eléctrica</strong> y <strong>⚙️ Mecánica</strong> mediante el selector de la barra superior. Al cambiar, todo el catálogo de cotizaciones y métricas se filtra de inmediato para reflejar el sector elegido.
+    </div>
+
+    <h2>Capítulo 2: Interfaz de Usuario y Navegación Responsiva</h2>
+    
+    <h3>2.1 Elementos de la Barra Superior</h3>
+    <ul>
+        <li><strong>Botón de Menú (☰):</strong> Expande o contrae la barra lateral de navegación.</li>
+        <li><strong>Selector de Rubro:</strong> Conmuta entre las divisiones de trabajo Eléctrico y Mecánico.</li>
+        <li><strong>Indicador de Usuario:</strong> Muestra el usuario activo y rol del operador.</li>
+        <li><strong>Campanita de Notificaciones:</strong> Despliega alertas en tiempo real sobre aprobaciones y certificaciones de avance registradas.</li>
+    </ul>
+
+    <h3>2.2 Panel NAVEGACIÓN y Adaptabilidad Móvil</h3>
+    <ul>
+        <li><strong>Botón [ ⬅️ Volver ]:</strong> Ubicado en la barra lateral al lado de <strong>NAVEGACIÓN</strong>, permite retroceder inmediatamente a la pantalla anterior.</li>
+        <li><strong>Cierre Automático en Teléfonos Celulares:</strong> Al seleccionar cualquier módulo desde un smartphone, el menú lateral se cierra automáticamente para brindar visualización completa e inmediata del contenido.</li>
+        <li><strong>Notificaciones Flotantes (Toasts):</strong> Mensajes emergentes compactos en la esquina superior derecha con auto-ocultamiento a los 2,4 segundos.</li>
+    </ul>
+
+    <h2>Capítulo 3: Módulo 1 - Confección y Emisión de Presupuestos</h2>
+    <p>La carga de un nuevo presupuesto se realiza de forma ágil y estructurada en 3 simples pasos:</p>
+
+    <div class="step-box">
+        <h3>Paso 1: Encabezado y Datos Comerciales del Proyecto</h3>
+        <ul>
+            <li><strong>Denominación del Servicio (Obligatorio):</strong> Campo descriptivo que se presenta limpio y vacío listo para la carga del nuevo proyecto.</li>
+            <li><strong>Cliente (Obligatorio):</strong> Selección rápida desde el catálogo corporativo o mediante la tecla de acceso rápido <code>F6</code>.</li>
+            <li><strong>Proveedor:</strong> Precompletado automáticamente como <em>SG MONTAJES SRL</em>.</li>
+            <li><strong>Fecha de Oferta:</strong> Registra la fecha de emisión (por defecto el día actual).</li>
+            <li><strong>Validez de la Oferta:</strong> Plazo de vigencia (ejemplo: <em>15 días corridos</em>).</li>
+            <li><strong>Fechas y Plazos de Ejecución:</strong> Fecha estimada de inicio, duración estimada y plazo de finalización.</li>
+        </ul>
+    </div>
+
+    <div class="step-box">
+        <h3>Paso 2: Carga del Tarifario de Ítems / Planilla Técnica</h3>
+        <ul>
+            <li>Seleccione el concepto técnico desde el buscador de tarifarios.</li>
+            <li>Ingrese la <strong>Cantidad</strong> requerida. La unidad (<code>HS</code>, <code>GLB</code>, <code>UN</code>, <code>MTS</code>) y el precio unitario se cargan automáticamente.</li>
+            <li>El sistema calcula los subtotales e incrementa automáticamente el I.V.A. (21%).</li>
+        </ul>
+    </div>
+
+    <div class="step-box">
+        <h3>Paso 3: Confirmación y Carga Continua</h3>
+        <p>Al pulsar el botón <strong>Confirmar y Cargar</strong>:</p>
+        <ol>
+            <li>El sistema almacena el presupuesto en la base de datos asignando el correlativo oficial <code>101-MEC-XXXX</code> o <code>102-ELEC-XXXX</code>.</li>
+            <li>Inmediatamente <strong>reinicia el formulario en blanco</strong> (dejando la Denominación del Servicio y los ítems limpios) para permitir la carga fluida del siguiente presupuesto sin demoras.</li>
+        </ol>
+    </div>
+
+    <h2>Capítulo 4: Módulo 2 - Estados Comerciales, Avance de Obra y Facturación</h2>
+    <p>Control centralizado del ciclo de vida comercial y financiero de las obras.</p>
+
+    <h3>4.1 Matriz Jerárquica de los 6 Estados Comerciales</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Estado</th>
+                <th>Insignia</th>
+                <th>Descripción y Requisitos</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>1. Enviado sin OC</strong></td>
+                <td><span class="badge badge-amber">ENVIADO SIN OC</span></td>
+                <td>Oferta emitida y entregada al cliente, pendiente de resolución.</td>
+            </tr>
+            <tr>
+                <td><strong>2. Aprobado sin OC</strong></td>
+                <td><span class="badge badge-blue">APROBADO SIN OC</span></td>
+                <td>Aprobación preliminar verbal o por correo sin orden de compra oficial.</td>
+            </tr>
+            <tr>
+                <td><strong>3. Aprobado con OC</strong></td>
+                <td><span class="badge badge-green">APROBADO CON OC</span></td>
+                <td>Adjudicación formal. <strong>Requisito obligatorio:</strong> ingresar N° de Orden de Compra.</td>
+            </tr>
+            <tr>
+                <td><strong>4. Facturado Parcial</strong></td>
+                <td><span class="badge badge-purple">FACTURADO PARCIAL</span></td>
+                <td>Facturas emitidas correspondientes a certificaciones de avance de obra.</td>
+            </tr>
+            <tr>
+                <td><strong>5. Facturado Total</strong></td>
+                <td><span class="badge badge-green">FACTURADO TOTAL</span></td>
+                <td>100% facturado. Obra concluida y proceso administrativo cerrado.</td>
+            </tr>
+            <tr>
+                <td><strong>6. Rechazado</strong></td>
+                <td><span class="badge badge-red">RECHAZADO</span></td>
+                <td>Oferta no aceptada. <strong>Requisito obligatorio:</strong> ingresar motivo de rechazo.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="alert-important">
+        <strong>🚫 Prohibición Estricta de Retroceso de Estados:</strong><br>
+        Los presupuestos siguen un avance estrictamente progresivo. Un presupuesto que ha alcanzado un nivel superior no puede retroceder a estados inferiores (por ejemplo, <em>Facturado Parcial</em> no puede volver a <em>Aprobado sin OC</em>). Las opciones bloqueadas aparecen con el símbolo <code>🚫</code> en el selector.
+    </div>
+
+    <h3>4.2 Certificación Física de Avance de Obra</h3>
+    <p>Para registrar hitos certificados en planta:</p>
+    <ol>
+        <li>Haga clic en el botón <strong>🔨 Avance</strong> en la grilla del presupuesto.</li>
+        <li>Ingrese el porcentaje certificado (<strong>obligatorio con coma decimal <code>,</code></strong>, ej: <code>25,5</code>). El límite máximo acumulado es <strong>100%</strong>.</li>
+        <li>Ingrese la fecha del hito, N° de documento/acta y detalle técnico.</li>
+    </ol>
+
+    <h3>4.3 Disparo Automático de Alerta por Correo a Facturación</h3>
+    <p>Al guardar un hito de avance, el sistema envía automáticamente una notificación por correo electrónico:</p>
+    <div class="screen-mock">
+        📄 Notificación de Avance de Obra: Se registró un avance del 30% ($150.000,00) para el Presupuesto 101-MEC-0005 (CARGILL SACI). Total a facturar: 30% ($150.000,00) de $500.000,00.
+    </div>
+
+    <h3>4.4 Alerta Destacada "⚠️ FALTA FACTURAR"</h3>
+    <p>Cuando existe un porcentaje de avance físico certificado que aún no ha sido facturado por el área contable, la grilla resalta automáticamente la fila con un cartel llamativo:</p>
+    <div class="alert-danger">
+        <strong>⚠️ FALTA FACTURAR: 40% (Avance Obra: 70% | Facturado: 30%)</strong><br>
+        Indica el importe exacto pendiente de emisión de factura según las certificaciones reales de obra.
+    </div>
+
+    <h2>Capítulo 5: Módulo 3 - Visualización de Comprobantes (Detallado y Resumido)</h2>
+    
+    <h3>5.1 Selector Dinámico: Detallado vs Resumido</h3>
+    <p>Al visualizar una cotización con el botón <strong>[ 👁️ Ver ]</strong>, el usuario puede conmutar instantáneamente:</p>
+    <ul>
+        <li><strong>📄 Comprobante Detallado:</strong> Muestra la planilla completa con el desglose ítem por ítem, rubros, cantidades, unidades de medida, precios unitarios y subtotales.</li>
+        <li><strong>📋 Comprobante Resumido:</strong> Presenta la cotización condensada en una sola línea ejecutiva con la denominación del trabajo, cantidad global, subtotal neto, I.V.A. (21%) e importe total final.</li>
+    </ul>
+
+    <h3>5.2 Opciones de Despacho</h3>
+    <ul>
+        <li><strong>🖨️ PDF / Impresión Oficial:</strong> Formato A4 profesional con membrete corporativo, condiciones comerciales y casillas de firma.</li>
+        <li><strong>💬 WhatsApp Directo:</strong> Genera el mensaje estructurado con el resumen ejecutivo de la oferta listo para enviar al cliente.</li>
+        <li><strong>📧 Envío por Correo Electrónico:</strong> Despacha la notificación oficial a la casilla del cliente.</li>
+    </ul>
+
+    <h2>Capítulo 6: Módulo 4 - Métricas Gerenciales y Business Intelligence (BI)</h2>
+    <p>El módulo de analítica ofrece visibilidad total en tiempo real con filtros dinámicos por rango de fechas, rubro y vendedor.</p>
+
+    <h3>6.1 Las 8 Métricas KPI en Tiempo Real</h3>
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-title">💼 Total Presupuestado</div>
+            <div class="kpi-val">$ 124.500.000</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">💎 Total Facturado</div>
+            <div class="kpi-val">$ 78.200.000</div>
+        </div>
+        <div class="kpi-card" style="border-left: 3px solid #0284c7;">
+            <div class="kpi-title">📅 Facturado en el Mes</div>
+            <div class="kpi-val">$ 18.450.000</div>
+        </div>
+        <div class="kpi-card" style="border-left: 3px solid #10b981;">
+            <div class="kpi-title">📈 Facturado en el Año</div>
+            <div class="kpi-val">$ 65.800.000</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">⏳ Saldo por Cobrar</div>
+            <div class="kpi-val">$ 46.300.000</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">✅ Aprobados con OC</div>
+            <div class="kpi-val">24 Obras</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">⚡ Rubro Eléctrico</div>
+            <div class="kpi-val">$ 68.300.000</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">⚙️ Rubro Mecánico</div>
+            <div class="kpi-val">$ 56.200.000</div>
+        </div>
+    </div>
+
+    <div class="alert-info">
+        <strong>📌 Detalle de los Nuevos Indicadores Temporales:</strong>
+        <ul>
+            <li><strong>📅 Facturado en el Mes:</strong> Computa el volumen financiero facturado (incluyendo avances de obra certificados) durante el mes calendario en curso, permitiendo evaluar el cumplimiento de objetivos mensuales inmediatos.</li>
+            <li><strong>📈 Facturado en el Año:</strong> Computa el acumulado fiscal anual de facturación, brindando la métrica macro del ejercicio contable de la empresa.</li>
+        </ul>
+    </div>
+
+    <h3>6.2 Gráficos de Rendimiento y Tablas Analíticas</h3>
+    <ul>
+        <li><strong>Rendimiento por Vendedor:</strong> Muestra cotizaciones emitidas, obras adjudicadas con OC, total cotizado, total facturado y el <strong>% de Efectividad de Cierre</strong>.</li>
+        <li><strong>Resumen por Cliente:</strong> Detalla volumen contratado, avance promedio, facturación acumulada y saldo pendiente por cliente.</li>
+    </ul>
+
+    <h2>Capítulo 7: Módulo 5 - Reporte Impreso Oficial y Exportación a Excel</h2>
+    <p>Herramientas diseñadas para la presentación ejecutiva ante directorio y la auditoría contable externa.</p>
+
+    <h3>7.1 🖨️ Reporte Impreso Gerencial Multi-Tabla</h3>
+    <p>El reporte impreso oficial ha sido optimizado con los siguientes estándares de alta calidad:</p>
+    <ul>
+        <li><strong>Comienzo directo en la Página 1:</strong> Se eliminaron los saltos o páginas en blanco iniciales mediante una reestructuración completa del layout de impresión.</li>
+        <li><strong>Estructura Limpia en 4 Tablas Ejecutivas (Sin Gráficos Pesados):</strong>
+            <ol>
+                <li><strong>Tabla 1: Resumen de Indicadores Clave (8 KPIs):</strong> Cuadro estructurado con totales, aprobados, facturación mensual, anual y saldos.</li>
+                <li><strong>Tabla 2: Resumen por Estado Comercial:</strong> Cantidad de presupuestos, subtotal neto, IVA y total por estado.</li>
+                <li><strong>Tabla 3: Resumen Consolidado por Cliente:</strong> Importes agrupados por cuenta con fila de <strong>TOTAL GENERAL CLIENTES</strong>.</li>
+                <li><strong>Tabla 4: Detalle de Cotizaciones:</strong> Listado individual completo con ID, fecha, rubro, cliente, obra, estado, % avance y total con IVA.</li>
+            </ol>
+        </li>
+        <li><strong>Paginación Continua y Encabezados Repetibles:</strong> Los títulos de tabla se mantienen legibles a lo largo de todas las páginas del documento.</li>
+    </ul>
+
+    <h3>7.2 📑 Exportación a Planilla Excel Oficial (`.xls`)</h3>
+    <p>Al hacer clic en <strong>[ 📑 Exportar Excel ]</strong>, el sistema genera de forma nativa una hoja de cálculo estructurada con:</p>
+    <ul>
+        <li>Membrete corporativo oficial y fecha/hora exacta de emisión.</li>
+        <li>Estructura idéntica al reporte gerencial: 8 KPIs, resumen por estado comercial, resumen por clientes y planilla detallada de presupuestos.</li>
+        <li><strong>Formato Numérico Oficial:</strong> Todos los valores monetarios se exportan con formato de moneda (<code>$ #.##0,00</code>) y porcentajes reales listos para fórmulas y análisis contables.</li>
+    </ul>
+
+    <h2>Capítulo 8: Módulo 6 - Consulta de Stock e Inventario PRESEA</h2>
+    <ul>
+        <li>Búsqueda rápida en tiempo real de insumos, materiales y repuestos por código o descripción.</li>
+        <li>Filtro directo por rubros y familias de artículos.</li>
+        <li>Visualización inmediata de la disponibilidad física de stock para planificar compras y cotizaciones técnicas.</li>
+    </ul>
+
+    <h2>Capítulo 9: Seguridad, Roles y Configuración del Sistema</h2>
+    
+    <h3>9.1 Matriz de Usuarios y Permisos</h3>
+    <ul>
+        <li><strong>Usuarios Administradores (`mel`, `melani`):</strong> Control total del sistema, conmutación de rubros, auditoría, configuración de parámetros y gestión de usuarios.</li>
+        <li><strong>Usuarios Solicitantes / Técnicos:</strong> Carga de presupuestos, actualización de estados de su rubro y registro de certificaciones de avance de obra.</li>
+    </ul>
+
+    <h3>9.2 Parámetros de Seguridad por Usuario</h3>
+    <ul>
+        <li><strong>👁️ Visualizar Comprobante / Historial:</strong> Permite consultar comprobantes y auditoría en modo lectura (botón <code>[ 👁️ Ver ]</code>).</li>
+        <li><strong>✏️ Editar y Avance de Obra:</strong> Habilita la edición de datos, certificación de hitos de obra y basar presupuestos (botones <code>[ ✏️ Editar ]</code>, <code>[ 🔨 Avance ]</code> y <code>[ 📑 Basar Pres. ]</code>).</li>
+    </ul>
+
+    <div class="footer-doc">
+        <strong>SG MONTAJES SRL</strong> &copy; 2026 — Manual Técnico Operativo Oficial v2.5
+    </div>
+
+</body>
+</html>

@@ -1,232 +1,263 @@
-# Prompt Completo: Simulador PRESEA — Ingreso y Autorización de Pedidos
+# 📑 Especificación y Prompt Maestro Completo: Sistema de Gestión de Presupuestos — SG MONTAJES SRL
 
-Este documento resume todas las solicitudes realizadas durante el desarrollo del simulador de pedidos comerciales PRESEA, y cómo fue resuelta cada una. El proyecto es una aplicación web estática (HTML + JS + CSS) ubicada en `/Users/melanigrandi/ANTY/NOTA DE VENTA/`.
-
----
-
-## 🧱 Stack Técnico
-
-- **Frontend**: HTML5 puro + JavaScript Vanilla + CSS custom
-- **Datos**: Archivos `.js` generados desde bases de datos `.DBI` de FoxPro mediante un script Python (`compilar_datos.py`)
-- **Persistencia**: `localStorage` del navegador
-- **Sin backend**: Todo corre desde el sistema de archivos local del Mac (`file://`)
+Documento integral y prompt maestro consolidado con todos los requerimientos, reglas de negocio, flujos de trabajo, esquema de datos, arquitectura y módulos implementados para la plataforma web de **SG MONTAJES SRL (Ingeniería & Montajes Industriales)**.
 
 ---
 
-## 📋 Solicitudes y Resoluciones
+## 🏢 1. Identidad y Propósito del Sistema
+
+- **Empresa**: SG MONTAJES SRL — Ingeniería & Montajes Industriales • Obras Eléctricas y Mecánicas
+- **Objetivo**: Sistema web empresarial para la gestión integral de cotizaciones comerciales, presupuestos técnicos, seguimiento y certificación de avances de obra, control estricto de facturación proporcional, consulta de stock PRESEA y analítica gerencial en tiempo real (Business Intelligence).
+- **Acceso en Producción**: https://gr-nota-de-venta.web.app
+- **Servidor Local / API**: Python 3 (`server.py` en `http://localhost:8000`)
 
 ---
 
-### 1. 🔐 No podía acceder al sistema (login/carga bloqueada)
+## ⚙️ 2. Arquitectura y Stack Tecnológico
 
-**Problema**: La pantalla de login cargaba indefinidamente o quedaba en blanco.
-
-**Causa**: Funciones en `app.js` declaradas con sintaxis de `function expression` (`const fn = function() {}`) dentro del scope de la inicialización, lo que causaba errores de hoisting — el evento `DOMContentLoaded` intentaba llamar funciones que todavía no existían en memoria.
-
-**Solución**: Se refactorizaron todas las funciones críticas de inicialización (login, render de menú, setup de vistas) a declaraciones estándar `function fn() {}` para garantizar hoisting completo antes de la ejecución del DOM.
-
----
-
-### 2. 🚂 Transporte y Depósito: búsqueda mejorada (estilo PRESEA)
-
-**Problema**: Los campos de Transporte y Depósito eran poco prácticos de usar — el usuario solicitó que funcionaran igual que el buscador de clientes en PRESEA: escribir y filtrar en tiempo real.
-
-**Solución**:
-- Se implementaron campos de texto con **autocomplete en tiempo real** para Depósito y Transporte.
-- Al escribir, se filtra sobre los registros parseados de `DEPOSITOPALA.DBI` y `TRANSPORTEPALA.DBI`.
-- Al seleccionar un registro, se almacena el objeto completo para su uso al generar el pedido.
-- El diseño mantiene el estilo oscuro glassmorphism del sistema.
+- **Frontend**: HTML5 Semántico + Vanilla JavaScript (ES6+ modular, reactivo, sin dependencias pesadas) + CSS3 Glassmorphism responsivo + Chart.js para visualización de métricas.
+- **Backend API**: Servidor Python nativo (`server.py`) con API REST, endpoints de analítica, base de datos local SQLite/JSON, despacho SMTP corporativo y compresión de respuestas.
+- **Base de Datos y Sincronización en Tiempo Real**: Supabase (PostgreSQL 15 + Supabase Realtime Channels) sincronizado bidireccionalmente con `localStorage` y catálogos estáticos compilados desde DBF (`clientes_db.js`, `condiciones_db.js`, `stock_db.js`, `vendedores_db.js`, `presupuestos_catalog_db.js`).
+- **Despacho de Correos**: Servidor SMTP Corporativo oficial (`@sgmontajes.com.ar`) para el envío automático de notificaciones de avance de obra y facturación administrativa.
+- **Diseño Adaptativo**: 100% responsivo para celulares, tablets, computadoras portátiles y de escritorio.
 
 ---
 
-### 3. ✅❌ Modal de Autorización: Opciones de Aceptado/Rechazado con Radio Buttons
+## ⚡ 3. Gestión de Rubros Industriales
 
-**Problema**: El usuario pedía que en el modal de autorización hubiera dos opciones claras (`Aceptado` / `Rechazado`) con radio buttons (tilde), y que el botón al pie dijera únicamente **"Aceptar"**. El campo de Motivo de Rechazo debía marcarse como **Obligatorio** y solo aparecer al seleccionar "Rechazado".
+El sistema opera bajo dos rubros principales totalmente diferenciados con correlatividades separadas:
 
-**Solución**:
-- Se rediseñó el bloque de acciones del modal `tpl-modal-auth` en `index.html`.
-- Se añadieron dos radio buttons: `✅ Aceptado / Autorizado` y `❌ Rechazado`.
-- El campo `Motivo del Rechazo (Obligatorio)` solo se muestra con animación `fadeIn` cuando se selecciona "Rechazado".
-- La función `confirmarResolucion()` valida que el motivo no esté vacío antes de permitir el rechazo.
-- Un único botón **"Aceptar"** al pie ejecuta la resolución.
+1. **⚡ Presupuesto Eléctrico (`102-ELEC-XXXX`)**:
+   - Cotización de montajes eléctricos industriales, tableros de potencia y comando, tendido de bandejas portacables, cableados de fuerza motriz, iluminación industrial y cálculo de horas hombre técnicas.
+   - Catálogo de materiales eléctricos y tarifario de mano de obra especializada.
 
----
+2. **⚙️ Presupuesto Mecánico (`101-MEC-XXXX`)**:
+   - Cotización de montajes mecánicos pesados, estructuras metálicas, cañerías industriales, soldadura calificada, piping y mecanizados.
+   - Ficha técnica completa de oferta: Denominación de la Obra/Instalación, Planta, Proveedor (SG MONTAJES SRL), Fecha de Oferta, Validez, Plazo de Ejecución, Fechas Estimadas de Inicio/Fin, N° OT, Propuesta Técnica, Personal Asignado y Cláusula de Exclusiones.
 
-### 4. 📦 Consulta de Stock: nueva sección desde `STOCKPALA.DBI`
-
-**Problema**: El usuario solicitó agregar una sección de consulta de stock extraída de la base de datos de FoxPro.
-
-**Solución**:
-- Se extendió `compilar_datos.py` para parsear `STOCKPALA.DBI` y generar `stock_db.js` con **3.263 artículos**.
-- Se creó la vista `tpl-stock-query` con:
-  - **Barra de búsqueda** por código o descripción.
-  - **Filtros por Rubro y Estado**.
-  - **KPIs** (total artículos, artículos con stock, artículos sin stock).
-  - Tabla con código, descripción, rubro, estado y stock actual.
-- La sección es accesible desde el menú lateral de todos los roles.
+- **Conmutador de Rubro Superior**: Selector en la barra de navegación para alternar instantáneamente entre vistas Eléctrica y Mecánica sin recargar la página.
+- **Denominación del Servicio Limpia**: En ambas modalidades, el campo "Denominación del Servicio" se presenta vacío por defecto listo para la carga específica de la obra.
 
 ---
 
-### 5. ✏️ Precios en Cero: edición de precio al cargar artículos
+## 🔄 4. Flujo y Reglas de Estados Comerciales
 
-**Problema**: Muchos artículos traían precio `$0,00` desde la base de FoxPro porque no tenían lista de precio cargada. El vendedor no podía ingresar el precio correcto.
+### 4.1. Secuencia Progresiva de Estados
+El ciclo de vida comercial sigue una jerarquía estrictamente progresiva:
 
-**Solución**:
-- Se agregó el campo `#req-product-price` (Precio Unitario) en el formulario de carga de pedidos.
-- Al seleccionar un artículo con el autocomplete o el buscador F6, el campo se completa con `PRECIO_1` si está disponible; si es `0`, queda editable para que el vendedor tipee el valor manualmente.
-- Al presionar **"Agregar"**, se toma el precio del input en vez del precio fijo de la base.
-- **Grilla editable**: Las columnas de Cantidad y Precio Unitario de la tabla de artículos cargados se convirtieron en `<input>` editables. Cambiar cualquier valor recalcula el subtotal de fila y el importe total del pedido en tiempo real.
+1. `📤 Enviado sin OC` *(Nivel 1)*: Presupuesto emitido y entregado formalmente al cliente, a la espera de confirmación.
+2. `⏳ Aprobado sin OC` *(Nivel 2)*: Aprobación verbal/preliminar del cliente previa a la emisión de la orden de compra.
+3. `✅ Aprobado con OC` *(Nivel 3)*: Aprobación formal adjudicada. **Exige ingreso obligatorio del Número de Orden de Compra (OC)**.
+4. `🧾 Facturado Parcial` *(Nivel 4)*: Facturación parcial emitida correspondiente a hitos de avance de obra certificados.
+5. `💎 Facturado Total` *(Nivel 5)*: 100% del importe total facturado y obra administrativa concluida.
+6. `❌ Rechazado` *(Estado Terminal)*: Oferta desestimada por el cliente. **Exige ingreso obligatorio del motivo de rechazo**.
 
----
-
-### 6. 🔍 Buscador F6: Modal de Búsqueda Avanzada de Artículos (Robot de Stock)
-
-**Problema**: El usuario quería poder buscar artículos de stock con un modal avanzado al estilo PRESEA, accesible con la tecla F6 o un botón.
-
-**Solución**:
-- Se creó el modal `tpl-modal-robot-stock` con:
-  - Campo de búsqueda en tiempo real.
-  - Filtro por Rubro.
-  - Tabla de resultados con código, descripción, precio y stock disponible (resaltado en verde/rojo).
-  - Al hacer doble clic en una fila, el artículo se selecciona y los campos del formulario se completan automáticamente.
+### 4.2. 🚫 Prohibición Estricta de Retroceso de Estados
+- **Los estados no pueden volver atrás**: Un presupuesto que ha alcanzado un nivel superior no puede retroceder a uno anterior (por ejemplo, `Facturado Parcial` no puede cambiar a `Aprobado con OC`, `Aprobado sin OC` ni `Enviado sin OC`).
+- **En el selector desplegable**: Las opciones inferiores a la actual aparecen deshabilitadas con el indicador `🚫`.
+- **En "Estado del Presupuesto"**: Los presupuestos en `💎 Facturado Total` permanecen siempre visibles en la grilla para registro histórico y auditoría contable.
 
 ---
 
-### 7. ☑️ Autorización Parcial por Ítem: "Autorizar por Parte"
+## 🏗️ 5. Avance de Obra y Control de Facturación
 
-**Problema**: El usuario necesitaba poder autorizar solo algunos artículos de un pedido (desmarcar uno y autorizar el resto), ajustar cantidades, y que el importe del pedido se recalcule en consecuencia.
+### 5.1. Certificación de Avance de Obra
+- Registro de hitos de avance con:
+  - **% de Avance** (ingresado con coma decimal `,`, tope estricto del 100% acumulado).
+  - **Fecha del Hito**.
+  - **N° de Documento / Acta de Certificación**.
+  - **Detalle de los trabajos ejecutados**.
+- **Cálculo Automático en Pesos**: Determina en tiempo real el monto valorizado en pesos del avance ingresado respecto al monto total del presupuesto.
+- **Notificación Automática por Email**: Disparo de correo de alerta a Facturación (`📄 Notificación de Avance de Obra`) cada vez que se certifica un nuevo hito.
 
-**Solución**:
-- En la planilla `tpl-modal-auth` se agregaron para cada ítem:
-  - Un **checkbox** (`.auth-item-check`) para incluirlo/excluirlo.
-  - Un **input de cantidad** (`.auth-item-qty`) con tope en la cantidad original.
-  - Un **subtotal dinámico** que se actualiza en tiempo real.
-- Al pie de la tabla aparecen dos totalizadores: **Total Original** y **Monto a Autorizar**.
-- La función `recalcAuthTotal()` recalcula en tiempo real con cada cambio de checkbox o cantidad.
-
----
-
-### 8. 🐛 Bug: Artículo desmarcado desaparecía del pedido y se autorizaba igual
-
-**Problema**: Al desmarcar un artículo y presionar Aceptar, el artículo desaparecía de la lista del pedido. A pesar de eso, el sistema reportaba la orden como completamente aprobada.
-
-**Causa raíz**: Dos bugs combinados:
-1. **Mutación de referencia en JavaScript**: `pedidoActivo` apuntaba al mismo objeto en memoria que `appData.pedidos[orderIdx]`. Al asignar el nuevo importe, la variable original también mutaba, por lo que la comparación `totalAmt < pedidoActivo.importe` siempre evaluaba `false`.
-2. **Eliminación de ítems**: Los artículos desmarcados se excluían del array `finalItems`, desapareciendo sin dejar rastro.
-
-**Solución**:
-- Se captura `originalImporte` en una variable local **antes** de mutar `appData.pedidos[orderIdx]`.
-- Los ítems desmarcados ya **no se eliminan**: se marcan con `estado: 'Pendiente'` en lugar de borrarse del array.
-- Se añadieron los campos `cantidad_original` y `estado` a cada ítem para trazabilidad.
+### 5.2. Reglas de Facturación Proporcional
+1. **Tope por Avance**: El `% Facturado` **nunca puede superar el % de Avance de Obra realizado**.
+2. **Avance 0%**: Si el avance de obra es `0%`, está estrictamente prohibido ingresar porcentaje de facturación o cambiar el estado a `Facturado`.
+3. **Facturado Total**: Para marcar un presupuesto como `Facturado Total` (100%), la obra debe tener certificado previamente el **100% de Avance de Obra**.
+4. **Límite Absoluto**: Ningún porcentaje (ni de avance ni de facturación) puede exceder el **100%**.
+5. **Aviso Destacado "FALTA FACTURAR"**: Si existe avance físico certificado superior al porcentaje facturado, el sistema muestra en la grilla una alerta ámbar/roja con el monto exacto listo para facturar.
 
 ---
 
-### 9. 🔄 Pedido que queda pendiente al autorizar parcialmente
+## 📊 6. Módulo de Estadísticas y Business Intelligence (BI)
 
-**Problema**: Al autorizar algunos ítems y desmarcar otros, el pedido completo desaparecía de la lista de "Autorización de Pedidos" porque cambiaba a estado `"Autorizado"`.
+El panel analítico de control gerencial (`tpl-metrics`) opera en tiempo real con filtros por rango de fechas, rubro y operador:
 
-**Solución**: Se rediseñó la lógica de `resolveOrder()`:
+### 6.1. Recuadro de KPIs (8 Indicadores Clave)
+1. **Total Presupuestado**: Monto total acumulado y cantidad de cotizaciones emitidas.
+2. **Total Facturado (Avances)**: Monto monetario real certificado y porcentaje global facturado.
+3. 📅 **Facturado en el Mes**: Suma de facturación y avances registrados en el mes calendario en curso (ej. *Septiembre 2026*).
+4. 📈 **Facturado en el Año**: Suma acumulada de facturación en el año fiscal en curso (ej. *2026*).
+5. **Saldo Pendiente de Cobro**: Monto por certificar/facturar hasta completar las obras.
+6. **Aprobados con OC**: Cantidad de presupuestos y volumen monetario formalmente adjudicado.
+7. **⚡ Rubro Eléctrico**: Monto y cantidad de cotizaciones del sector eléctrico.
+8. **⚙️ Rubro Mecánico**: Monto y cantidad de cotizaciones del sector mecánico.
 
-- Ahora evalúa si quedan ítems en estado `"Pendiente"` luego de la aprobación parcial.
-- **Si hay ítems pendientes** → el estado del pedido sigue siendo `"Pendiente de Autorización"` y **permanece en la lista de pendientes**.
-- **Si todos los ítems fueron resueltos** → el pedido pasa a `"Autorizado"` y sale de la cola.
-- Los ítems ya aprobados en una ronda anterior se muestran bloqueados (solo lectura, fondo verde con etiqueta "YA AUTORIZADO") cuando el autorizador vuelve a abrir la planilla.
+### 6.2. Visualizaciones Gráficas Interactivas (Chart.js)
+1. **Distribución por Estado Comercial**: Gráfico de torta con cantidades de aprobados, pendientes y rechazados.
+2. **Monto Total vs Facturado por Estado**: Gráfico de barras comparativo de volumen financiero.
+3. **Top 5 Clientes en Cotización**: Gráfico de barras horizontal con las 5 cuentas de mayor volumen cotizado.
+4. **Mix de Rubros (Eléctrico vs Mecánico)**: Gráfico de dona con la participación porcentual de cada división.
 
----
-
-### 10. 🏷️ Badge decía "Retenido" en lugar de "Pendiente"
-
-**Problema**: El texto del badge de estado en la tabla de pedidos decía **"Retenido"** pero debía decir **"Pendiente"**.
-
-**Solución**: Cambio puntual en `renderAssignmentsTable()` en `app.js`: la condición `p.estado === 'Pendiente de Autorización'` ahora genera el badge con el texto `Pendiente`.
-
----
-
-### 11. 🔄 Bug: Al rechazar ítems pendientes, se rechazaban también los ya autorizados
-
-**Problema**: Si en un pedido parcialmente aprobado (con ítems en `"Autorizado"` de una ronda anterior), el autorizador seleccionaba "Rechazado" para los ítems pendientes restantes, el sistema pisaba **todos** los ítems (incluyendo los ya autorizados) con estado `"Rechazado"`.
-
-**Solución**: Se modificó el bloque `rechazar` en `resolveOrder()`:
-- Se itera el array de ítems del pedido.
-- Los ítems que ya tienen `estado === 'Autorizado'` se **conservan tal cual** y su importe se suma al total del pedido.
-- Solo los ítems que siguen en estado `"Pendiente"` se marcan como `"Rechazado"` con cantidad `0` y subtotal `$0,00`.
-- Si al final quedan ítems autorizados → el pedido cierra como **"Autorizado"** (parcial).
-- Si ningún ítem fue aprobado → el pedido cierra como **"Rechazado"** total.
+### 6.3. Tablas Analíticas de Rendimiento
+- **Rendimiento por Usuario / Operador**: Presupuestos emitidos, aprobados con OC, monto cotizado, total facturado y **% de Efectividad Comercial**.
+- **Resumen Financiero por Cliente**: Cotizaciones por cliente, volumen total, avance promedio, facturación acumulada y saldo pendiente.
 
 ---
 
-### 12. 🏢 Rebranding a GR_CONSULTING y Formatos de Cotización/Presupuesto (NV)
+## 🖨️ 7. Reporte Impreso Oficial Gerencial (PDF / Impresión)
 
-**Problema**: Se requería quitar la identidad anterior de Barenbrug Palaversich por GR_CONSULTING, establecer una regla estricta de 12 dígitos (4 enteros, 8 decimales) para cotización y 9 dígitos fijos para el número secuencial del Presupuesto, y cambiar los datos del reporte a la sucursal de Rosario.
+Diseñado para presentación formal gerencial con inicio directo en la **Hoja 1** (sin hojas en blanco):
 
-**Solución**:
-- Reemplazo completo de logos y texto de Barenbrug Palaversich por **GR_CONSULTING** con logo y fondo premium.
-- Validación de input en cotizaciones para limitar la escritura a un máximo de 12 caracteres (4 enteros, 8 decimales), autocompletando a 8 decimales al perder foco.
-- Formateo estricto del número de Presupuesto a 9 dígitos secuenciales con prefijo `7000` (ej: `700008215`).
-- Cambio del pie de reporte a: Rosario, Santa Fe (Av. del Rosario 5678, Tel: 3412723904, Fax: 3412723904).
-
----
-
-### 13. ✏️ Modificación Completa del Presupuesto (Condición, Moneda, Depósito, Transporte y Cantidades)
-
-**Problema**: El usuario requería poder modificar todo en un Presupuesto: condición, moneda, depósito, transporte y cantidad de artículos.
-
-**Solución**:
-- Se creó una sección y programa **"Modificación de Presupuesto"**.
-- Se implementó un buffer de edición (`pedidoEdicionTemp`) para almacenar los cambios intermedios de forma segura.
-- Los datos fijos se convirtieron en campos editables en modo Modificación (Select para Condición y Moneda con cotización, e inputs de cantidades para artículos).
-- Se añadieron botones de lupa para Depósito y Transporte que abren buscadores avanzados F6 (`abrirRobotDepositosEdicion` / `abrirRobotTransportesEdicion`), registran la selección en el buffer y refrescan el modal de detalle sin perder cambios previos.
-- Al guardar los cambios, se recalcula el importe total, se actualizan cantidades y estados de ítems, el estado del Presupuesto se restablece a `"Pendiente de Autorización"`, y se persiste en `localStorage`.
+- **Encabezado Oficial**: Logo de SG MONTAJES SRL, fecha y hora de emisión, período analizado y filtros activos (Operador y Rubro).
+- **Sección 1: Indicadores Financieros Clave (KPIs)**: Grilla de 8 tarjetas ejecutivas con tipografía nítida y legible.
+- **Sección 2: Resumen Financiero por Cliente**: Tabla completa de clientes con fila de **TOTAL GENERAL CLIENTES**.
+- **Sección 3: Rendimiento por Vendedor / Operador**: Tabla con cotizaciones, aprobaciones, montos y **% de efectividad comercial**, con fila de **TOTAL GENERAL VENDEDORES**.
+- **Sección 4: Detalle Completo de Cotizaciones**: Listado completo de presupuestos filtrados (ID, Fecha, Rubro, Cliente, Obra, Importe Total, Estado Comercial con badges de color, % Avance y Facturado) con fila de **TOTAL GENERAL COTIZACIONES**.
+- **Paginación Inteligente**: Encabezados de tabla repetibles en cada hoja (`thead { display: table-header-group; }`).
 
 ---
 
-### 14. ❌ Presupuestos Rechazados
+## 📑 8. Exportación de Planilla Excel Profesional (`.xls`)
 
-**Problema**: El usuario solicitó un historial/vista específica donde se guarden y listen los Presupuestos rechazados.
+Generador nativo de hojas de cálculo Microsoft Excel (`.xls`) con estilos corporativos y formato numérico oficial:
 
-**Solución**:
-- Se añadió la opción **"Rechazo de Presupuesto"** al menú lateral de todos los roles.
-- Si el rol es Solicitante, filtra para mostrar solo sus propios Presupuestos rechazados; para Administrador y Autorizador se muestran todos.
-- Al abrir un Presupuesto rechazado, se presenta en modo de solo lectura (estilo Presea) destacada en rojo con el motivo de rechazo ingresado por el autorizador.
-
----
-
-### 15. 🚫 Validación de Stock 0
-
-**Problema**: Si un artículo seleccionado tiene stock de 0, el sistema no debería permitir agregarlo a la lista de detalles ni realizar el Presupuesto, y debe figurar un cartel o advertencia que diga "Stock 0".
-
-**Solución**:
-- Se modificó `agregarArticuloDetalle` en `app.js` para validar si el artículo de stock seleccionado tiene stock menor o igual a `0`. En tal caso, bloquea la adición y lanza un cartel toast de error de tipo `'danger'` con el texto: *"Stock 0: El artículo seleccionado no tiene unidades disponibles."*.
-- Se añadió una advertencia inmediata al seleccionar el producto (`seleccionarProducto` en `app.js`) mediante un toast de tipo `'warning'` para notificar al usuario de forma proactiva.
-- Se mejoró visualmente el listado de autocompletado de productos (`renderDropdownChunk` en `app.js`), de modo que aquellos ítems con stock de `0` aparecen atenuados, con el stock en rojo y con una etiqueta explícita de `[STOCK 0]`.
+- **Estructura Multi-Tabla**:
+  1. **Encabezado y Metadatos**: Fecha de emisión, período y filtros aplicados.
+  2. **Tabla 1: Resumen Ejecutivo Consolidado**: 8 KPIs con formato de moneda (`$ #,##0.00`), porcentajes y totales.
+  3. **Tabla 2: Resumen de Cuentas por Cliente**: Presupuestos, total cotizado, % avance, total facturado y saldo por cobrar.
+  4. **Tabla 3: Rendimiento por Usuario / Operador**: Efectividad de cierre, montos cotizados y facturados.
+  5. **Tabla 4: Detalle de Cotizaciones y Presupuestos**: ID, Fecha, Rubro, Cliente, CUIT, Obra, Importe, Estado, % Avance, Facturado, N° OC y Operador.
 
 ---
 
-## 📁 Archivos Modificados
+## 👁️ 9. Confección y Visualización de Comprobantes (Detallado y Resumido)
 
-| Archivo | Tipo de cambio |
-|---|---|
-| [`app.js`](file:///Users/melanigrandi/ANTY/NOTA%20DE%20VENTA/app.js) | Lógica: login, modales, buffer de edición, lupas de edición F6, guardado de Presupuestos, filtros de vistas y validaciones de stock |
-| [`index.html`](file:///Users/melanigrandi/ANTY/NOTA%20DE%20VENTA/index.html) | HTML: Containers para campos dinámicos editables (condición, moneda, depósito, transporte) en modal de detalle |
-| [`styles.css`](file:///Users/melanigrandi/ANTY/NOTA%20DE%20VENTA/styles.css) | Estilos: logo GR_CONSULTING, fondos oscuros premium, badges de estado |
-| [`compilar_datos.py`](file:///Users/melanigrandi/ANTY/NOTA%20DE%20VENTA/compilar_datos.py) | Parser FoxPro de bases de datos FoxPro a JS estáticos |
+- **Carga Continua de Presupuestos**: Al pulsar "Confirmar y Cargar", el sistema guarda la oferta e inmediatamente reinicia el formulario en blanco para permitir la carga ágil del siguiente presupuesto.
+- **Comprobante Detallado**: Muestra el desglose técnico ítem por ítem con precios unitarios, cantidades, IVA y subtotales.
+- **Comprobante Resumido**: Muestra la oferta comercial condensada en una única línea resumen con denominación de la obra, neto, IVA (21%) y total final.
+- **Alternancia Rápida**: Selector superior con cambio instantáneo entre ambas modalidades.
+- **Opciones de Emisión**: Impresión en A4 con membrete oficial, envío directo por WhatsApp y despacho por correo electrónico.
 
 ---
 
-## 🏁 Estado Final del Sistema
+## 📦 10. Consulta de Stock e Inventario PRESEA
 
-- ✅ Login funcional para 4 roles: Administrador, Autorizador, Solicitante
-- ✅ Carga de pedidos con búsqueda de clientes, depósito, transporte y artículos
-- ✅ Precios y cantidades editables por el vendedor al cargar artículos
-- ✅ Rebranding completo a GR_CONSULTING y datos de reporte actualizados a sucursal Rosario
-- ✅ Control estricto de números de Presupuesto (9 dígitos) y cotización (12 caracteres en total, 8 decimales)
-- ✅ Edición completa de cabecera de Presupuesto (Condición, Moneda, Depósito, Transporte) y cantidades de artículos
-- ✅ Buscador F6 de artículos, depósitos y transportistas en edición
-- ✅ Sección para ver el listado de Presupuestos Rechazados con motivo de rechazo
-- ✅ Autorización parcial por ítem con tildado/destildado individual
-- ✅ Recálculo dinámico de totales en tiempo real
-- ✅ Persistencia local mediante `localStorage`
-- ✅ Consulta de stock con filtros por rubro y estado
-- ✅ Descarga de planilla CSV por pedido
-- ✅ Validación y bloqueo estricto con aviso "Stock 0" para artículos sin stock disponible
+- Módulo dedicado para la búsqueda en tiempo real de artículos y materiales.
+- Filtros por código, descripción, rubro y subrubro.
+- Indicadores visuales de stock físico existente y disponibilidad comercial inmediata.
 
+---
+
+## 👥 11. Usuarios, Permisos y Seguridad
+
+- **Usuarios Registrados**:
+  - `mel` (Administrador — Rubro Eléctrico)
+  - `juanluis` (Solicitante — Rubro Eléctrico)
+  - `luciano` (Solicitante — Rubro Eléctrico)
+  - `roberto` (Solicitante — Rubro Mecánico)
+  - `melani` (Administrador — Rubro Eléctrico)
+  - `nicole` (Solicitante — Rubro Eléctrico)
+  - `alexis` (Solicitante — Rubro Mecánico)
+  - `emiliano` (Solicitante — Rubro Eléctrico)
+
+- **Parámetros de Seguridad por Usuario**:
+  - `Visualizar Comprobante / Historial`: Consulta en modo lectura y auditoría (`[ 👁️ Ver ]`).
+  - `Editar y Avance de Obra`: Modificación de datos, avance de obra y basar presupuesto (`[ ✏️ Editar ]`, `[ 🔨 Avance ]`, `[ 📑 Basar Pres. ]`).
+- **Limpieza de Datos**: Eliminación total de conceptos obsoletos de *Depósito*, *Transporte* y *Vendedores externos*.
+
+---
+
+## 🗄️ 12. Esquema de Base de Datos en Supabase (PostgreSQL)
+
+```sql
+-- TABLA: USUARIOS
+CREATE TABLE IF NOT EXISTS usuarios (
+    id TEXT PRIMARY KEY,
+    username TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    email TEXT,
+    role TEXT NOT NULL DEFAULT 'Solicitante',
+    rubro_defecto TEXT NOT NULL DEFAULT 'Eléctrico',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+);
+
+-- TABLA: PRESUPUESTOS
+CREATE TABLE IF NOT EXISTS presupuestos (
+    id TEXT PRIMARY KEY,
+    fecha TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
+    tipo_presupuesto TEXT NOT NULL,
+    cliente_id TEXT NOT NULL,
+    cliente_nombre TEXT NOT NULL,
+    cuit TEXT,
+    telefono TEXT,
+    email TEXT,
+    importe NUMERIC(15, 2) NOT NULL DEFAULT 0.00,
+    estado TEXT NOT NULL DEFAULT 'Enviado sin OC',
+    nro_oc TEXT,
+    motivo_rechazo TEXT,
+    operador TEXT NOT NULL,
+    condicion_venta TEXT,
+    moneda_id INT DEFAULT 1,
+    cotizacion NUMERIC(15, 8) DEFAULT 1.00000000,
+    
+    -- Campos Ficha Mecánica / Identificación de la Oferta
+    meca_denominacion TEXT,
+    meca_proveedor TEXT,
+    meca_fecha_oferta TEXT,
+    meca_validez TEXT,
+    meca_planta TEXT,
+    meca_nro_oc TEXT,
+    meca_nro_ot TEXT,
+    meca_fecha_inicio TEXT,
+    meca_duracion TEXT,
+    meca_fecha_fin TEXT,
+    meca_propuesta TEXT,
+    meca_personal TEXT,
+    meca_exclusiones TEXT,
+    
+    -- Avance y Facturación
+    avance_porcentaje_acumulado NUMERIC(5, 2) DEFAULT 0.00,
+    facturado_porcentaje NUMERIC(5, 2) DEFAULT 0.00,
+    monto_facturado NUMERIC(15, 2) DEFAULT 0.00,
+    
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+);
+
+-- TABLA: ITEMS DE PRESUPUESTO
+CREATE TABLE IF NOT EXISTS presupuesto_items (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    presupuesto_id TEXT REFERENCES presupuestos(id) ON DELETE CASCADE,
+    codigo TEXT,
+    detalle TEXT NOT NULL,
+    rubro TEXT,
+    subrubro TEXT,
+    cantidad NUMERIC(10, 2) NOT NULL DEFAULT 1,
+    unidad TEXT DEFAULT 'UN',
+    precio_unitario NUMERIC(15, 2) NOT NULL DEFAULT 0.00,
+    subtotal NUMERIC(15, 2) NOT NULL DEFAULT 0.00,
+    orden INT DEFAULT 0
+);
+
+-- TABLA: AVANCES DE OBRA
+CREATE TABLE IF NOT EXISTS avances_obra (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    presupuesto_id TEXT REFERENCES presupuestos(id) ON DELETE CASCADE,
+    fecha DATE NOT NULL,
+    porcentaje NUMERIC(5, 2) NOT NULL,
+    monto_equivalente NUMERIC(15, 2) NOT NULL,
+    nro_documento TEXT,
+    detalle TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+);
+
+-- TABLA: APP STATE (SINCRONIZACIÓN GLOBAL)
+CREATE TABLE IF NOT EXISTS app_state (
+    id TEXT PRIMARY KEY DEFAULT 'global_config',
+    data JSONB NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+);
+
+-- PUBLICACIÓN TIEMPO REAL
+ALTER PUBLICATION supabase_realtime ADD TABLE presupuestos, presupuesto_items, avances_obra, app_state;
+```
