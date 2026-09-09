@@ -1241,8 +1241,8 @@ input:focus, select:focus, textarea:focus {
     }
 
     body.modal-open {
-        background: #0f172a !important;
-        color: #f8fafc !important;
+        background: #ffffff !important;
+        color: #000000 !important;
         margin: 0 !important;
         padding: 0 !important;
         height: auto !important;
@@ -1257,7 +1257,7 @@ input:focus, select:focus, textarea:focus {
         width: 100% !important;
         max-width: 100% !important;
         height: auto !important;
-        background: #0f172a !important;
+        background: #ffffff !important;
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
         padding: 0 !important;
@@ -1303,17 +1303,17 @@ input:focus, select:focus, textarea:focus {
 
     body.modal-open .palaversich-sheet {
         position: relative !important;
-        background: #0f172a !important;
-        color: #f8fafc !important;
-        border: 1px solid rgba(255, 255, 255, 0.14) !important;
-        border-radius: 8px !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        border: 1.5px solid #000000 !important;
+        border-radius: 6px !important;
         box-shadow: none !important;
-        padding: 16px 20px !important;
+        padding: 14px 18px !important;
         margin: 0 auto !important;
         width: 100% !important;
         max-width: 100% !important;
         box-sizing: border-box !important;
-        font-size: 10px !important;
+        font-size: 9.5px !important;
         page-break-inside: avoid !important;
         break-inside: avoid !important;
         page-break-before: avoid !important;
@@ -1323,16 +1323,17 @@ input:focus, select:focus, textarea:focus {
         print-color-adjust: exact !important;
     }
 
+    /* Logo de fondo en Gris (Marca de Agua Fuerte, Nítida y Bien Visible) */
     body.modal-open .sheet-watermark {
         position: absolute !important;
-        top: 50% !important;
+        top: 62% !important;
         left: 50% !important;
         transform: translate(-50%, -50%) !important;
-        width: 540px !important;
-        max-width: 85% !important;
-        opacity: 0.60 !important;
-        filter: brightness(1.25) contrast(1.25) !important;
-        -webkit-filter: brightness(1.25) contrast(1.25) !important;
+        width: 560px !important;
+        max-width: 88% !important;
+        opacity: 0.42 !important;
+        filter: grayscale(100%) contrast(1.6) brightness(0.5) !important;
+        -webkit-filter: grayscale(100%) contrast(1.6) brightness(0.5) !important;
         pointer-events: none !important;
         user-select: none !important;
         z-index: 0 !important;
@@ -1347,8 +1348,8 @@ input:focus, select:focus, textarea:focus {
         width: 100% !important;
         height: auto !important;
         object-fit: contain !important;
-        filter: brightness(1.25) contrast(1.25) !important;
-        -webkit-filter: brightness(1.25) contrast(1.25) !important;
+        filter: grayscale(100%) contrast(1.6) brightness(0.5) !important;
+        -webkit-filter: grayscale(100%) contrast(1.6) brightness(0.5) !important;
         opacity: 1 !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
@@ -1363,24 +1364,24 @@ input:focus, select:focus, textarea:focus {
     body.modal-open .invoice-header {
         display: flex !important;
         justify-content: space-between !important;
-        border: 1px solid rgba(255, 255, 255, 0.14) !important;
-        border-radius: 6px !important;
-        background: rgba(15, 23, 42, 0.35) !important;
-        color: #f8fafc !important;
+        border: 1.5px solid #000000 !important;
+        border-radius: 4px !important;
+        background: transparent !important;
+        color: #000000 !important;
         padding-bottom: 4px !important;
-        margin-bottom: 8px !important;
+        margin-bottom: 6px !important;
         overflow: hidden !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
 
     body.modal-open .header-box {
-        color: #f8fafc !important;
+        color: #000000 !important;
     }
 
     body.modal-open .header-left {
-        border-right: 1px solid rgba(255, 255, 255, 0.14) !important;
-        color: #f8fafc !important;
+        border-right: 1.5px solid #000000 !important;
+        color: #000000 !important;
     }
 
     body.modal-open .header-left .logo-container img {
@@ -1400,67 +1401,105 @@ input:focus, select:focus, textarea:focus {
     body.modal-open .company-details {
         font-size: 9px !important;
         line-height: 1.35 !important;
-        color: #cbd5e1 !important;
+        color: #1e293b !important;
+    }
+
+    body.modal-open .company-details strong {
+        color: #000000 !important;
+        font-weight: 800 !important;
+    }
+
+    /* Caja Central: Comprobante X en Impresión */
+    body.modal-open .header-middle {
+        background: #000000 !important;
+        border-left: 1.5px solid #000000 !important;
+        border-right: 1.5px solid #000000 !important;
+        color: #ffffff !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
 
     body.modal-open .invoice-letter {
         font-size: 18px !important;
-        border: 2px solid rgba(56, 189, 248, 0.6) !important;
+        font-weight: 900 !important;
+        border: 2px solid #ffffff !important;
         width: 28px !important;
         height: 28px !important;
         line-height: 26px !important;
-        color: #38bdf8 !important;
-        background: rgba(15, 23, 42, 0.6) !important;
+        color: #ffffff !important;
+        background: transparent !important;
         border-radius: 4px !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
 
     body.modal-open .invoice-warning {
-        font-size: 7px !important;
-        color: #94a3b8 !important;
+        font-size: 7.5px !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
         line-height: 1.1 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
 
     body.modal-open .invoice-title {
         font-size: 14px !important;
         font-weight: 900 !important;
-        color: #38bdf8 !important;
+        color: #000000 !important;
         letter-spacing: 0.5px !important;
     }
 
     body.modal-open .invoice-number {
-        font-size: 10px !important;
-        color: #f8fafc !important;
-        font-weight: 700 !important;
+        font-size: 10.5px !important;
+        color: #000000 !important;
+        font-weight: 800 !important;
+    }
+
+    body.modal-open .invoice-number span,
+    body.modal-open #auth-id {
+        color: #000000 !important;
+        font-weight: 900 !important;
     }
 
     body.modal-open .invoice-date {
         font-size: 9px !important;
-        color: #cbd5e1 !important;
+        color: #1e293b !important;
+        font-weight: 700 !important;
+    }
+
+    body.modal-open .invoice-date span,
+    body.modal-open #auth-date-val {
+        color: #000000 !important;
         font-weight: 700 !important;
     }
 
     body.modal-open #auth-header-oc-container {
         font-size: 9px !important;
-        background: rgba(15, 23, 42, 0.5) !important;
-        border: 1px dashed rgba(56, 189, 248, 0.4) !important;
-        color: #38bdf8 !important;
+        background: rgba(241, 245, 249, 0.8) !important;
+        border: 1px dashed #000000 !important;
+        color: #000000 !important;
         padding: 2px 6px !important;
         border-radius: 4px !important;
+        font-weight: 800 !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
+    }
+
+    body.modal-open #auth-header-oc-container span,
+    body.modal-open #auth-header-nro-oc-val {
+        color: #000000 !important;
+        font-weight: 900 !important;
     }
 
     /* FICHA CLIENTE PRESEA Y CONTROL DE VISTA RESUMIDO / DETALLADO */
     body.modal-open #auth-mecanico-header-box {
         display: block !important;
-        background: rgba(15, 23, 42, 0.35) !important;
-        border: 1px solid rgba(255, 255, 255, 0.14) !important;
-        border-radius: 6px !important;
-        margin-bottom: 8px !important;
+        background: transparent !important;
+        border: 1.5px solid #000000 !important;
+        border-radius: 4px !important;
+        margin-bottom: 6px !important;
         font-size: 9.5px !important;
-        color: #f8fafc !important;
+        color: #000000 !important;
         box-shadow: none !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
@@ -1475,7 +1514,7 @@ input:focus, select:focus, textarea:focus {
     body.modal-open textarea {
         border: none !important;
         background: transparent !important;
-        color: #f8fafc !important;
+        color: #000000 !important;
         padding: 0 !important;
         font-size: inherit !important;
         font-family: inherit !important;
@@ -1485,8 +1524,8 @@ input:focus, select:focus, textarea:focus {
     }
 
     body.modal-open #auth-mecanico-header-box > div {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-        padding: 4px 8px !important;
+        border-bottom: 1px solid #cbd5e1 !important;
+        padding: 3.5px 6px !important;
     }
 
     body.modal-open #auth-mecanico-header-box > div:last-child {
@@ -1494,36 +1533,57 @@ input:focus, select:focus, textarea:focus {
     }
 
     body.modal-open #auth-mecanico-header-box span[style*="background: #e0f2fe"],
-    body.modal-open #auth-mecanico-header-box span[style*="background: rgba(56, 189, 248"] {
-        background: rgba(56, 189, 248, 0.15) !important;
-        color: #38bdf8 !important;
-        border: 1px solid rgba(56, 189, 248, 0.3) !important;
-        padding: 2px 6px !important;
+    body.modal-open #auth-mecanico-header-box span[style*="background: rgba(56, 189, 248"],
+    body.modal-open #auth-mecanico-header-box span[style*="background"] {
+        background: rgba(241, 245, 249, 0.8) !important;
+        color: #000000 !important;
+        border: 1px solid #94a3b8 !important;
+        padding: 1.5px 5px !important;
         border-radius: 3px !important;
         font-weight: 800 !important;
-        font-size: 9px !important;
+        font-size: 8.5px !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
 
     body.modal-open #auth-mecanico-header-box span,
     body.modal-open #auth-mecanico-header-box strong {
-        color: #f8fafc !important;
+        color: #000000 !important;
+    }
+
+    /* Presupuesto Rechazado (Cartel de Rechazo en Impresión) */
+    body.modal-open div[style*="border-color: #ef4444"],
+    body.modal-open div[style*="border-color: rgb(239, 68, 68)"],
+    body.modal-open div[style*="PRESUPUESTO RECHAZADO"] {
+        background: rgba(254, 242, 242, 0.85) !important;
+        border: 1.5px solid #ef4444 !important;
+        color: #991b1b !important;
+        border-radius: 4px !important;
+        padding: 4px 8px !important;
+        margin: 4px 0 !important;
+        font-size: 9px !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    body.modal-open div[style*="border-color: #ef4444"] *,
+    body.modal-open div[style*="PRESUPUESTO RECHAZADO"] * {
+        color: #991b1b !important;
     }
 
     /* 2. PROPUESTA COMERCIAL (TABLA DE ÍTEMS / TARIFARIO EN IMPRESIÓN) */
     body.modal-open #auth-mecanico-excel-container {
-        margin-bottom: 8px !important;
+        margin-bottom: 6px !important;
         background: transparent !important;
     }
 
     body.modal-open #auth-mecanico-excel-container > div {
-        background: rgba(15, 23, 42, 0.28) !important;
-        border: 1px solid rgba(255, 255, 255, 0.14) !important;
-        border-radius: 6px !important;
+        background: transparent !important;
+        border: 1.5px solid #000000 !important;
+        border-radius: 4px !important;
         box-shadow: none !important;
-        color: #f8fafc !important;
-        margin-bottom: 8px !important;
+        color: #000000 !important;
+        margin-bottom: 6px !important;
         overflow: hidden !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
@@ -1538,28 +1598,28 @@ input:focus, select:focus, textarea:focus {
     body.modal-open #auth-mecanico-excel-container table {
         width: 100% !important;
         border-collapse: collapse !important;
-        font-size: 10px !important;
-        color: #f8fafc !important;
+        font-size: 9.5px !important;
+        color: #000000 !important;
         background: transparent !important;
     }
 
     body.modal-open #auth-mecanico-excel-container th {
-        background: rgba(15, 23, 42, 0.50) !important;
-        color: #f8fafc !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        padding: 5px 8px !important;
-        font-size: 10px !important;
-        font-weight: 800 !important;
+        background: rgba(226, 232, 240, 0.75) !important;
+        color: #000000 !important;
+        border: 1px solid #94a3b8 !important;
+        padding: 4px 6px !important;
+        font-size: 9px !important;
+        font-weight: 900 !important;
         text-transform: uppercase !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
 
     body.modal-open #auth-mecanico-excel-container th span {
-        background: rgba(56, 189, 248, 0.15) !important;
-        color: #38bdf8 !important;
-        border: 1px solid rgba(56, 189, 248, 0.3) !important;
-        padding: 2px 6px !important;
+        background: rgba(203, 213, 225, 0.8) !important;
+        color: #000000 !important;
+        border: 1px solid #94a3b8 !important;
+        padding: 1.5px 5px !important;
         border-radius: 3px !important;
         font-weight: 800 !important;
         -webkit-print-color-adjust: exact !important;
@@ -1568,52 +1628,52 @@ input:focus, select:focus, textarea:focus {
 
     body.modal-open #auth-mecanico-excel-container td {
         background: transparent !important;
-        color: #f8fafc !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        padding: 5px 8px !important;
-        font-size: 10px !important;
+        color: #000000 !important;
+        border: 1px solid #cbd5e1 !important;
+        padding: 4px 6px !important;
+        font-size: 9px !important;
         font-weight: 600 !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
 
     body.modal-open #auth-mecanico-excel-container td span {
-        color: #94a3b8 !important;
+        color: #334155 !important;
     }
 
     body.modal-open #auth-mecanico-excel-container tbody tr:nth-child(even) td {
-        background: rgba(15, 23, 42, 0.15) !important;
+        background: rgba(0, 0, 0, 0.02) !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
 
     body.modal-open #auth-mecanico-excel-container tfoot tr {
-        background: rgba(15, 23, 42, 0.50) !important;
-        font-size: 10px !important;
+        background: rgba(241, 245, 249, 0.75) !important;
+        font-size: 9.5px !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
 
     body.modal-open #auth-mecanico-excel-container tfoot td {
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        padding: 6px 10px !important;
-        color: #f8fafc !important;
+        border: 1px solid #94a3b8 !important;
+        padding: 4px 8px !important;
+        color: #000000 !important;
         font-weight: 800 !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
 
     body.modal-open #auth-mecanico-excel-container tfoot tr:last-child {
-        background: rgba(16, 185, 129, 0.18) !important;
-        border-top: 2px solid #10b981 !important;
+        background: rgba(226, 232, 240, 0.85) !important;
+        border-top: 2px solid #000000 !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
 
     body.modal-open #auth-mecanico-excel-container tfoot tr:last-child td {
-        border: 1px solid rgba(16, 185, 129, 0.3) !important;
-        color: #4ade80 !important;
-        font-size: 12px !important;
+        border: 1px solid #000000 !important;
+        color: #000000 !important;
+        font-size: 11px !important;
         font-weight: 900 !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
@@ -1621,69 +1681,78 @@ input:focus, select:focus, textarea:focus {
 
     /* Observaciones dentro del modal */
     body.modal-open #auth-mecanico-excel-container div[style*="margin-top: 10px"] {
-        background: rgba(15, 23, 42, 0.35) !important;
-        border: 1px solid rgba(255, 255, 255, 0.14) !important;
-        color: #f8fafc !important;
-        font-size: 10px !important;
-        padding: 6px 10px !important;
+        background: transparent !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #000000 !important;
+        font-size: 9px !important;
+        padding: 4px 8px !important;
         margin-top: 4px !important;
-        border-radius: 6px !important;
+        border-radius: 4px !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
 
-    /* Banner informativo y Aclaraciones */
-    body.modal-open div[style*="PRECIOS DEL PRESUPUESTO"] {
-        background: rgba(15, 23, 42, 0.35) !important;
-        border: 1px solid rgba(255, 255, 255, 0.14) !important;
-        color: #cbd5e1 !important;
-        font-size: 8.5px !important;
-        padding: 2px 5px !important;
-        margin: 4px 0 !important;
+    /* Banner informativo en Oscuro con Letras Blancas */
+    body.modal-open div[style*="PRECIOS DEL PRESUPUESTO"],
+    body.modal-open .presupuesto-disclaimer-banner {
+        background: #000000 !important;
+        border: 1.5px solid #000000 !important;
+        color: #ffffff !important;
+        font-size: 9.5px !important;
+        font-weight: 900 !important;
+        letter-spacing: 0.8px !important;
+        padding: 5px 10px !important;
+        margin: 6px 0 !important;
         border-radius: 4px !important;
+        text-align: center !important;
+        text-transform: uppercase !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
 
     body.modal-open #auth-mecanico-acclaraciones,
     body.modal-open #auth-mecanico-aclaraciones {
-        background: rgba(15, 23, 42, 0.35) !important;
-        border: 1px solid rgba(255, 255, 255, 0.14) !important;
-        color: #f8fafc !important;
+        background: transparent !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #000000 !important;
         font-size: 8.5px !important;
-        padding: 5px 8px !important;
+        padding: 4px 6px !important;
         margin-top: 4px !important;
         margin-bottom: 4px !important;
         line-height: 1.3 !important;
-        border-radius: 6px !important;
+        border-radius: 4px !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
 
     body.modal-open #auth-mecanico-aclaraciones div,
-    body.modal-open #auth-mecanico-aclaraciones strong {
-        color: #f8fafc !important;
+    body.modal-open #auth-mecanico-aclaraciones strong,
+    body.modal-open #auth-mecanico-aclaraciones span {
+        color: #000000 !important;
     }
 
     /* Pie de página oficial Presea / CAI */
     body.modal-open .invoice-footer-info {
         font-size: 8px !important;
-        color: #94a3b8 !important;
-        border: 1px solid rgba(255, 255, 255, 0.14) !important;
-        background: rgba(15, 23, 42, 0.35) !important;
-        padding: 4px 6px !important;
-        margin-top: 5px !important;
-        border-radius: 6px !important;
+        color: #475569 !important;
+        border: 1px solid #cbd5e1 !important;
+        background: transparent !important;
+        padding: 3px 6px !important;
+        margin-top: 4px !important;
+        border-radius: 4px !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
 
-    body.modal-open .invoice-footer-info span {
-        color: #f8fafc !important;
+    body.modal-open .invoice-footer-info span,
+    body.modal-open .invoice-footer-info strong {
+        color: #000000 !important;
     }
 
     body.modal-open .system-footer-line,
     body.modal-open .cai-details {
         background: transparent !important;
-        color: #94a3b8 !important;
+        color: #475569 !important;
     }
 
     /* Estilos de tablas impresas */
@@ -1945,14 +2014,14 @@ body[data-theme="light"] .theme-btn.active {
 /* Marca de Agua Central SG MONTAJES */
 .sheet-watermark {
     position: absolute !important;
-    top: 50% !important;
+    top: 62% !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
-    width: 540px !important;
-    max-width: 85% !important;
-    opacity: 0.60 !important;
-    filter: brightness(1.25) contrast(1.25) !important;
-    -webkit-filter: brightness(1.25) contrast(1.25) !important;
+    width: 560px !important;
+    max-width: 88% !important;
+    opacity: 0.75 !important;
+    filter: brightness(1.3) contrast(1.3) !important;
+    -webkit-filter: brightness(1.3) contrast(1.3) !important;
     pointer-events: none !important;
     user-select: none !important;
     z-index: 0 !important;
@@ -1967,8 +2036,8 @@ body[data-theme="light"] .theme-btn.active {
     width: 100% !important;
     height: auto !important;
     object-fit: contain !important;
-    filter: brightness(1.25) contrast(1.25) !important;
-    -webkit-filter: brightness(1.25) contrast(1.25) !important;
+    filter: brightness(1.3) contrast(1.3) !important;
+    -webkit-filter: brightness(1.3) contrast(1.3) !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
 }
