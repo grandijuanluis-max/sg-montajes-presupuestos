@@ -4763,7 +4763,7 @@ function seleccionarCliente(cliente) {
             const provInput = document.getElementById('req-meca-proveedor');
             if (provInput) {
                 provInput.focus();
-                abrirRobotProveedores();
+                // abrirRobotProveedores(); // Eliminado por pedido del usuario
             }
         }
     }, 250);
