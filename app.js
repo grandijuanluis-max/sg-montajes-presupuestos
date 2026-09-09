@@ -3609,7 +3609,7 @@ function initRequestView() {
             const userVendedorCodigo = currentUser ? currentUser.vendedor_codigo : '';
             let filteredClients = clientesDB;
             if (userVendedorCodigo) {
-                filteredClients = clientesDB.filter(c => c.vendedor_id === userVendedorCodigo);
+                filteredClients = clientesDB.filter(c => c.vendedor_id === userVendedorCodigo || !c.vendedor_id || c.vendedor_id === '');
             }
             
             if (cleanQuery === '') {
